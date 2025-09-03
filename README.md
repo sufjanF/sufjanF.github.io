@@ -1,6 +1,4 @@
-# CS 180 Projects 
-
-This repository hosts my user site at **https://sufjanf.github.io**.
+# CS 180 Portfolio 
 
 - **Project 0:** https://sufjanf.github.io/project0/
 
