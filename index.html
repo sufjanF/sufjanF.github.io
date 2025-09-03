@@ -1,46 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CS 180 Project Hub</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem auto;
-      max-width: 700px;
-      line-height: 1.6;
-    }
-    h1 {
-      text-align: center;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      margin: 1rem 0;
-    }
-    a {
-      color: #0366d6;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CS 180 Projects — sufjanf</title>
+  <meta name="description" content="CS 180 coursework projects hosted on GitHub Pages." />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>CS 180 Project Hub</h1>
-  <p>Welcome! This site hosts my projects for CS 180. Each project has its own page:</p>
-  <ul>
-    <li><a href="project0/">Project 0: Starter Project</a></li>
-    <li>Project 1: Coming soon</li>
-    <li>Project 2: Coming soon</li>
-    <li>Project 3: Coming soon</li>
-  </ul>
+  <header>
+    <div class="container">
+      <h1>CS 180 Projects</h1>
+      <p class="subtitle">by <strong>sufjanf</strong> • Hosted on GitHub Pages</p>
+      <nav>
+        <a href="/">Home</a>
+        <a href="https://github.com/sufjanf" target="_blank" rel="noopener">GitHub</a>
+        <!-- Add course link or syllabus if you want -->
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>Projects</h2>
+    <div class="grid">
+      <!-- Project 0 Card -->
+      <a class="card" href="/project0/">
+        <h3>Project 0: Getting Started</h3>
+        <p class="meta">📌 Status: In progress</p>
+        <p>A minimal starter with page scaffolding and sample results. Click to view.</p>
+      </a>
+
+      <!-- To add a new project, copy this card and update the href and text
+      <a class="card" href="/project1/">
+        <h3>Project 1: NAME</h3>
+        <p class="meta">📌 Status: Not started</p>
+        <p>Short 1-2 sentence summary of the project.</p>
+      </a>
+      -->
+    </div>
+  </main>
+
   <footer>
-    <p>Hosted on <a href="https://github.com/<your-username>/<your-username>.github.io">GitHub Pages</a></p>
+    <div class="container">
+      <p>© <span id="year"></span> sufjanf · <a href="https://github.com/sufjanf/sufjanf.github.io" target="_blank" rel="noopener">View source</a></p>
+    </div>
   </footer>
+
+  <script>
+    // keep the year current
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
