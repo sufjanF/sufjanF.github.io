@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CS 180 Projects — sufjanf</title>
+  <title>CS 180 Portfolio — Sufjan Fana</title>
   <meta name="description" content="CS 180 coursework projects hosted on GitHub Pages." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #4f46e5;   /* used lightly on cards/links */
-      --bg: #0b1020;        /* deep backdrop to blend with space image */
+      --primary: #4f46e5;
+      --bg: #0b1020;
       --panel: #ffffff;
       --text: #e5e7eb;
       --muted: #cbd5e1;
@@ -30,18 +30,17 @@
     /* Hero with space background */
     .hero {
       position: relative;
-      min-height: 48vh;
+      min-height: 42vh;
       display: grid;
       place-items: center;
       text-align: center;
-      padding: 4rem 1rem 6rem;
+      padding: 4rem 1rem;
       background-image: url('./assets/space_background.jpg');
       background-size: cover;
-      background-position: center;
+      background-position: top center; /* crop so content doesn’t overlap */
       background-repeat: no-repeat;
       isolation: isolate;
     }
-    /* subtle dark overlay for readability */
     .hero::before {
       content: "";
       position: absolute;
@@ -49,8 +48,7 @@
       background: linear-gradient(
         to bottom,
         rgba(4,6,18,0.55),
-        rgba(4,6,18,0.65) 35%,
-        rgba(4,6,18,0.80)
+        rgba(4,6,18,0.75)
       );
       z-index: -1;
     }
@@ -70,26 +68,11 @@
       font-weight: 500;
       margin-bottom: 1rem;
     }
-    nav {
-      margin-top: 0.75rem;
-      display: inline-flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      padding-bottom: 2px;
-      border-bottom: 2px solid transparent;
-    }
-    nav a:hover { border-color: rgba(255,255,255,0.9); }
 
     /* Main content panel */
     .container {
       max-width: 1100px;
-      margin: -3.5rem auto 3rem; /* overlaps the hero slightly */
+      margin: -2rem auto 3rem;
       padding: 0 1rem;
     }
     .panel {
@@ -133,19 +116,13 @@
       padding: 2.25rem 1rem 2.75rem;
       font-size: 0.95rem;
     }
-    footer a { color: #c7d2fe; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <header class="hero">
     <div class="inner">
-      <h1>CS 180 Projects</h1>
-      <p class="subtitle">by <strong>sufjanf</strong> • Hosted on GitHub Pages</p>
-      <nav>
-        <a href="/">Home</a>
-        <a href="https://github.com/sufjanf" target="_blank" rel="noopener">GitHub</a>
-      </nav>
+      <h1>CS 180 Portfolio</h1>
+      <p class="subtitle">by <strong>Sufjan Fana</strong></p>
     </div>
   </header>
 
@@ -158,20 +135,12 @@
           <p class="meta">📌 Status: In Progress</p>
           <p>Minimal starter with scaffolding and first results.</p>
         </a>
-
-        <!-- Duplicate a card for future projects
-        <a class="card" href="/project1/">
-          <h3>Project 1: TITLE</h3>
-          <p class="meta">📌 Status: Not started</p>
-          <p>One-sentence summary of the project focus.</p>
-        </a>
-        -->
       </div>
     </section>
   </main>
 
   <footer>
-    <p>© <span id="year"></span> sufjanf · <a href="https://github.com/sufjanf/sufjanf.github.io" target="_blank" rel="noopener">View Source</a></p>
+    <p>© <span id="year"></span> Sufjan Fana</p>
   </footer>
 
   <script>
