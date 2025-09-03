@@ -5,55 +5,108 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CS 180 — Project 0</title>
   <meta name="description" content="CS 180 Project 0 by sufjanf." />
-  <link rel="stylesheet" href="../styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --accent: #9333ea;
+      --bg: #f9fafb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --radius: 12px;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      line-height: 1.7;
+    }
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      padding: 2.5rem 1rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    header p { color: #e0e7ff; }
+    nav a {
+      color: white;
+      margin: 0 0.75rem;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+    }
+    nav a:hover { border-color: white; }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      padding: 2rem;
+    }
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      border-left: 4px solid var(--primary);
+      padding-left: 0.5rem;
+    }
+    h3 { margin-top: 1.25rem; }
+    img {
+      max-width: 100%;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      margin: 1rem 0;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  </style>
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>Project 0: Getting Started</h1>
-      <p class="subtitle">CS 180 • by <strong>sufjanf</strong></p>
-      <nav>
-        <a href="/">⇦ Back to Home</a>
-        <a href="https://github.com/sufjanf/sufjanf.github.io/tree/main/project0" target="_blank" rel="noopener">Project Source</a>
-      </nav>
-    </div>
+    <h1>Project 0: Getting Started</h1>
+    <p>CS 180 • by <strong>sufjanf</strong></p>
+    <nav>
+      <a href="/">⇦ Back to Home</a>
+      <a href="https://github.com/sufjanf/sufjanf.github.io/tree/main/project0" target="_blank">Source Code</a>
+    </nav>
   </header>
 
-  <main class="container">
+  <main>
     <h2>Overview</h2>
-    <p>
-      Briefly describe the goal of Project 0: what you built, the concepts covered,
-      and any key decisions.
-    </p>
+    <p>This is the write-up for Project 0. It introduces the workflow for CS 180 projects and demonstrates a simple result hosted on GitHub Pages.</p>
 
     <h2>Results</h2>
-    <p>Embed your outputs below (images, tables, small videos/GIFs, etc.).</p>
-    <!-- Example image (place it under project0/assets/ if you have one) -->
-    <!-- <img src="./assets/output.png" alt="Output visualization" style="max-width:100%;border:1px solid #eee;border-radius:8px;"> -->
+    <p>Below is an example result image (placeholder):</p>
+    <img src="https://via.placeholder.com/600x300.png?text=Project+0+Result" alt="Project 0 Output">
 
     <h2>Write-Up</h2>
     <h3>Approach</h3>
-    <p>Explain your method, algorithms, and any libraries used.</p>
+    <p>Explain your methodology, tools, and algorithms here.</p>
 
     <h3>Experiments</h3>
     <ul>
-      <li>Experiment A – description + findings.</li>
-      <li>Experiment B – description + findings.</li>
+      <li>Experiment A — description and findings.</li>
+      <li>Experiment B — description and findings.</li>
     </ul>
 
     <h3>Discussion</h3>
-    <p>Limitations, what went well, and future work.</p>
+    <p>Discuss limitations, what worked well, and future improvements.</p>
 
     <h2>References</h2>
     <ul>
-      <li>Paper / lecture notes / docs.</li>
+      <li>Lecture notes, research papers, or documentation you used.</li>
     </ul>
   </main>
 
   <footer>
-    <div class="container">
-      <p>© <span id="year"></span> sufjanf</p>
-    </div>
+    <p>© <span id="year"></span> sufjanf</p>
   </footer>
 
   <script>
