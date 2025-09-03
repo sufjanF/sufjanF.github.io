@@ -8,22 +8,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      /* palette tuned to space photo */
-      --bg: #070a17;            /* deep night */
+      --bg: #070a17;
       --panel: rgba(14,18,40,.55);
       --panelBorder: rgba(148,163,184,.18);
       --card: rgba(18,22,48,.6);
       --cardBorder: rgba(148,163,184,.15);
       --text: #e5e7eb;
       --muted: #a7b0c3;
-      --accent: #ffd089;        /* warm star tint */
-      --radius: 14px;
+      --accent: #ffd089;
+      --radiusPanel: 10px; /* less rounded */
+      --radiusCard: 8px;   /* less rounded */
       --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
     body{
+      display:flex;              /* sticky footer layout */
+      flex-direction:column;
+      min-height:100vh;
       font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
       background: radial-gradient(1200px 600px at 50% -200px, #0d1330 0%, var(--bg) 60%);
       color:var(--text);
@@ -32,21 +35,20 @@
       -moz-osx-font-smoothing:grayscale;
     }
 
-    /* HERO (shorter + fade-out so image ends below subtitle) */
+    /* HERO (cropped + fade-out) */
     .hero{
       position:relative;
       display:grid;
       place-items:center;
       text-align:center;
-      padding:4.2rem 1rem 2.2rem; /* shorter bottom padding = tighter crop */
-      min-height:30vh;            /* keeps banner compact */
+      padding:4.2rem 1rem 2.2rem;
+      min-height:30vh;
       background-image:url('./assets/space_background.jpg');
       background-size:cover;
-      background-position:center 42%; /* show more of the “ring”, crop bottom */
+      background-position:center 42%;
       background-repeat:no-repeat;
       isolation:isolate;
     }
-    /* darken for legibility */
     .hero::before{
       content:"";
       position:absolute; inset:0;
@@ -56,7 +58,6 @@
         rgba(4,6,18,.78) 85%);
       z-index:-1;
     }
-    /* fade to page bg so image visually "ends" just below subtitle */
     .hero::after{
       content:"";
       position:absolute; left:0; right:0; bottom:-1px; height:70px;
@@ -72,23 +73,31 @@
     }
     .subtitle{color:var(--muted);font-weight:500}
 
-    /* MAIN */
-    .container{max-width:1100px;margin:1.25rem auto 3rem;padding:0 1rem}
+    /* MAIN area stretches to push footer down */
+    main.container{
+      flex:1;                     /* key: fill remaining vertical space */
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:0 1rem;
+      margin:1rem 0 2rem;
+    }
+
     .panel{
+      width:100%;
+      max-width:1100px;
       background:var(--panel);
       border:1px solid var(--panelBorder);
-      border-radius:var(--radius);
+      border-radius:var(--radiusPanel);
       box-shadow:var(--shadow);
-      padding:1.6rem;
+      padding:1.4rem;
       backdrop-filter: blur(8px);
     }
 
-    /* GRID CARDS */
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-      gap:1.1rem;
-      margin-top:.25rem;
+      gap:1rem;
     }
     .card{
       display:block;
@@ -96,8 +105,8 @@
       color:inherit;
       background:var(--card);
       border:1px solid var(--cardBorder);
-      border-radius:12px;
-      padding:1.1rem 1.25rem;
+      border-radius:var(--radiusCard);
+      padding:1rem 1.1rem;
       transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
       box-shadow: 0 6px 18px rgba(0,0,0,.18);
     }
@@ -110,13 +119,11 @@
     .meta{color:#cbd5e1;font-size:.93rem;margin-bottom:.55rem;opacity:.9}
     .card p{color:#e9edf7;opacity:.95}
 
-    /* FOOTER */
     footer{
       text-align:center;color:var(--muted);
-      padding:2rem 1rem 2.5rem;font-size:.95rem
+      padding:1.75rem 1rem 2.25rem;font-size:.95rem
     }
 
-    /* small screens */
     @media (max-width:480px){
       .hero{min-height:28vh;padding:3.5rem 1rem 1.8rem;background-position:center 36%}
     }
@@ -133,11 +140,11 @@
   <main class="container">
     <section class="panel">
       <div class="grid">
-        <!-- Project 0 -->
         <a class="card" href="/project0/">
           <h3>Project 0: Becoming Friends with Your Camera</h3>
         </a>
-        <!-- Duplicate for future projects
+        <!-- Duplicate for future projects -->
+        <!--
         <a class="card" href="/project1/">
           <h3>Project 1: TITLE</h3>
           <p class="meta">📌 Status: Not started</p>
@@ -155,5 +162,4 @@
   <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 </body>
 </html>
-
 
