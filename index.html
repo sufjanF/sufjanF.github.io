@@ -5,50 +5,100 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CS 180 Projects — sufjanf</title>
   <meta name="description" content="CS 180 coursework projects hosted on GitHub Pages." />
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --accent: #9333ea;
+      --bg: #f9fafb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      padding: 3rem 1rem 4rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    header p { color: #e0e7ff; }
+    nav a {
+      color: white;
+      margin: 0 0.75rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+    }
+    nav a:hover { border-color: white; }
+    .container {
+      max-width: 1000px;
+      margin: -3rem auto 2rem;
+      padding: 0 1rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+    .card h3 { margin-bottom: 0.25rem; font-size: 1.25rem; }
+    .card .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  </style>
 </head>
 <body>
   <header>
-    <div class="container">
-      <h1>CS 180 Projects</h1>
-      <p class="subtitle">by <strong>sufjanf</strong> • Hosted on GitHub Pages</p>
-      <nav>
-        <a href="/">Home</a>
-        <a href="https://github.com/sufjanf" target="_blank" rel="noopener">GitHub</a>
-        <!-- Add course link or syllabus if you want -->
-      </nav>
-    </div>
+    <h1>CS 180 Projects</h1>
+    <p>by <strong>sufjanf</strong> • Hosted on GitHub Pages</p>
+    <nav>
+      <a href="/">Home</a>
+      <a href="https://github.com/sufjanf" target="_blank">GitHub</a>
+    </nav>
   </header>
 
   <main class="container">
-    <h2>Projects</h2>
     <div class="grid">
-      <!-- Project 0 Card -->
       <a class="card" href="/project0/">
         <h3>Project 0: Getting Started</h3>
-        <p class="meta">📌 Status: In progress</p>
-        <p>A minimal starter with page scaffolding and sample results. Click to view.</p>
+        <p class="meta">📌 Status: In Progress</p>
+        <p>A minimal starter project with scaffolding and initial results.</p>
       </a>
-
-      <!-- To add a new project, copy this card and update the href and text
-      <a class="card" href="/project1/">
-        <h3>Project 1: NAME</h3>
-        <p class="meta">📌 Status: Not started</p>
-        <p>Short 1-2 sentence summary of the project.</p>
-      </a>
-      -->
+      <!-- Add more project cards as needed -->
     </div>
   </main>
 
   <footer>
-    <div class="container">
-      <p>© <span id="year"></span> sufjanf · <a href="https://github.com/sufjanf/sufjanf.github.io" target="_blank" rel="noopener">View source</a></p>
-    </div>
+    <p>© <span id="year"></span> sufjanf · <a href="https://github.com/sufjanf/sufjanf.github.io">View Source</a></p>
   </footer>
 
   <script>
-    // keep the year current
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
+
