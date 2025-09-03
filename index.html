@@ -8,90 +8,170 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #4f46e5;
-      --accent: #9333ea;
-      --bg: #f9fafb;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --radius: 12px;
+      --primary: #4f46e5;   /* used lightly on cards/links */
+      --bg: #0b1020;        /* deep backdrop to blend with space image */
+      --panel: #ffffff;
+      --text: #e5e7eb;
+      --muted: #cbd5e1;
+      --radius: 14px;
+      --shadow: 0 10px 24px rgba(0,0,0,0.25);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-      padding: 3rem 1rem 4rem;
+
+    /* Hero with space background */
+    .hero {
+      position: relative;
+      min-height: 48vh;
+      display: grid;
+      place-items: center;
       text-align: center;
+      padding: 4rem 1rem 6rem;
+      background-image: url('./assets/space_background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      isolation: isolate;
     }
-    header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    header p { color: #e0e7ff; }
+    /* subtle dark overlay for readability */
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(4,6,18,0.55),
+        rgba(4,6,18,0.65) 35%,
+        rgba(4,6,18,0.80)
+      );
+      z-index: -1;
+    }
+    header .inner {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    nav {
+      margin-top: 0.75rem;
+      display: inline-flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
     nav a {
       color: white;
-      margin: 0 0.75rem;
-      font-weight: 500;
       text-decoration: none;
+      font-weight: 600;
+      padding-bottom: 2px;
       border-bottom: 2px solid transparent;
     }
-    nav a:hover { border-color: white; }
+    nav a:hover { border-color: rgba(255,255,255,0.9); }
+
+    /* Main content panel */
     .container {
-      max-width: 1000px;
-      margin: -3rem auto 2rem;
+      max-width: 1100px;
+      margin: -3.5rem auto 3rem; /* overlaps the hero slightly */
       padding: 0 1rem;
     }
+    .panel {
+      background: var(--panel);
+      color: #0f172a;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+    }
+
+    /* Project cards */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
+      margin-top: 0.5rem;
     }
     .card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+      display: block;
       text-decoration: none;
       color: inherit;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+      background: #fff;
     }
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      box-shadow: 0 10px 22px rgba(2,6,23,0.10);
+      border-color: #d1d5db;
     }
-    .card h3 { margin-bottom: 0.25rem; font-size: 1.25rem; }
-    .card .meta { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .card h3 { font-size: 1.15rem; margin-bottom: 0.25rem; line-height: 1.25; }
+    .meta { color: #64748b; font-size: 0.92rem; margin-bottom: 0.55rem; }
+    .card p { color: #0f172a; }
+
+    /* Footer */
     footer {
       text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
       color: var(--muted);
+      padding: 2.25rem 1rem 2.75rem;
+      font-size: 0.95rem;
     }
+    footer a { color: #c7d2fe; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>CS 180 Projects</h1>
-    <p>by <strong>sufjanf</strong> • Hosted on GitHub Pages</p>
-    <nav>
-      <a href="/">Home</a>
-      <a href="https://github.com/sufjanf" target="_blank">GitHub</a>
-    </nav>
+  <header class="hero">
+    <div class="inner">
+      <h1>CS 180 Projects</h1>
+      <p class="subtitle">by <strong>sufjanf</strong> • Hosted on GitHub Pages</p>
+      <nav>
+        <a href="/">Home</a>
+        <a href="https://github.com/sufjanf" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
   </header>
 
   <main class="container">
-    <div class="grid">
-      <a class="card" href="/project0/">
-        <h3>Project 0: Becoming Friends with Your Camera</h3>
-      </a>
-      <!-- Add more project cards as needed -->
-    </div>
+    <section class="panel">
+      <div class="grid">
+        <!-- Project 0 -->
+        <a class="card" href="/project0/">
+          <h3>Project 0: Getting Started</h3>
+          <p class="meta">📌 Status: In Progress</p>
+          <p>Minimal starter with scaffolding and first results.</p>
+        </a>
+
+        <!-- Duplicate a card for future projects
+        <a class="card" href="/project1/">
+          <h3>Project 1: TITLE</h3>
+          <p class="meta">📌 Status: Not started</p>
+          <p>One-sentence summary of the project focus.</p>
+        </a>
+        -->
+      </div>
+    </section>
   </main>
 
   <footer>
-    <p>© <span id="year"></span> sufjanf · <a href="https://github.com/sufjanf/sufjanf.github.io">View Source</a></p>
+    <p>© <span id="year"></span> sufjanf · <a href="https://github.com/sufjanf/sufjanf.github.io" target="_blank" rel="noopener">View Source</a></p>
   </footer>
 
   <script>
