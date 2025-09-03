@@ -31,26 +31,39 @@
     .images {
       display: flex;
       gap: 1rem;
-      margin-bottom: 0.25rem; /* tighter spacing above captions */
+      margin-bottom: 0.25rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     .images img {
-      max-width: 48%;
-      height: auto;          /* keeps natural proportions */
+      max-width: 45%;   /* pairs won’t get too big */
+      height: auto;
       border: 1px solid #d1d5db;
       border-radius: 6px;
       background: #e5e7eb;
     }
+    /* Special case: single image like GIF */
+    .images.single img {
+      max-width: 60%;   /* smaller than full width */
+    }
+
     .desc {
       display: flex;
       justify-content: space-between;
       font-size: 0.9rem;
       color: #4b5563;
-      margin-top: 0.2rem; /* closer to images */
+      margin-top: 0.2rem;
     }
     .desc p {
-      margin: 0; /* remove extra spacing */
+      margin: 0;
       flex: 1;
       text-align: center;
+    }
+    /* Single caption style */
+    .desc.single {
+      display: block;
+      text-align: center;
+      margin-top: 0.3rem;
     }
   </style>
 </head>
@@ -59,7 +72,7 @@
 
   <section class="subpart">
     <h2>Selfie: The Wrong Way vs. The Right Way</h2>
-    <p>Below are selfies that showcase how a subject can be distorted depending on factors such as distance and focal length. As a relative comparison, in the first image the face is narrower and in the second image the face is wider. Stepping back and zooming in alleviates distortion, as the subject’s facial features appear more natural and proportional compared to the wide-angle close-up selfie. </p>
+    <p>Below are selfies that showcase how a subject can be distorted depending on factors such as distance and focal. As a relative comparison, in the first image the face is narrower and in the second image the face is wider. Stepping back and zooming in alleviates distortion, the subject’s facial features appear more natural and proportional compared to the wide-angle close-up selfie. </p>
     <div class="images">
       <img src="assets/face1.png" alt="Close up and unzoomed selfie">
       <img src="assets/face2.png" alt="Far away and zoomed in selfie">
@@ -72,7 +85,7 @@
 
   <section class="subpart">
     <h2>Architectural Perspective Compression</h2>
-    <p>I took two photos of a pretty tree down a sidewalk. In the first one, I stood far away and zoomed into the subject. In the second, I walked up close with an unzoomed lens in order to try and match it to the first image. Zooming in increases focal length, which flattens perspective and compressed distance. The up close photo gives more depth and perspective points.</p>
+    <p>I took two photos of a pretty tree down a sidewalk. In the first one, I am standing far away and zoom into the subject. In the second, I walk up close with an unzoomed lens in order to try and match it to the first image. Zooming in increases focal length, which flattens perspective and compressed distance. The up close photo gives more depth and perspective points.</p>
     <div class="images">
       <img src="assets/outside1.png" alt="Far away and zoomed in">
       <img src="assets/outside2.png" alt="Close up and unzoomed">
@@ -85,15 +98,14 @@
 
   <section class="subpart">
     <h2>The Dolly Zoom</h2>
-    <p>To roughly emulate the dolly zoom effect in film, I took four successive photos of a set of plants on a table. After each photo, I took a few steps back while zooming in with the camera in order to preserve the image size. I then compiled them into a GIF, seen below.</p>
-    <div class="images">
+    <p>To roughly emulate the dolly zoom effect in film, I have taken four successive photos of a set of plants on a table. After each photo, I took a few steps back while zooming in with the camera in order to preserve the image size. I then compiled them into a GIF, seen below.</p>
+    <div class="images single">
       <img src="assets/plant.gif" alt="GIF of plants with varying focal lengths and distances">
     </div>
-    <div class="desc">
+    <div class="desc single">
       <p>GIF of plants with varying focal lengths and distances from the camera</p>
     </div>
   </section>
 </body>
 </html>
-
 
