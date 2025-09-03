@@ -3,114 +3,92 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CS 180 — Project 0</title>
-  <meta name="description" content="CS 180 Project 0 by sufjanf." />
+  <title>Project 0: Becoming Friends with Your Camera</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #4f46e5;
-      --accent: #9333ea;
-      --bg: #f9fafb;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --radius: 12px;
-    }
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
       margin: 0;
-      line-height: 1.7;
-    }
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-      padding: 2.5rem 1rem;
-      text-align: center;
-    }
-    header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-    header p { color: #e0e7ff; }
-    nav a {
-      color: white;
-      margin: 0 0.75rem;
-      text-decoration: none;
-      font-weight: 500;
-      border-bottom: 2px solid transparent;
-    }
-    nav a:hover { border-color: white; }
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      background: white;
-      border-radius: var(--radius);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
       padding: 2rem;
+      background: #f9fafb;
+      color: #111827;
     }
-    h2 {
-      margin-top: 2rem;
-      font-size: 1.5rem;
-      border-left: 4px solid var(--primary);
-      padding-left: 0.5rem;
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
-    h3 { margin-top: 1.25rem; }
-    img {
-      max-width: 100%;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-      margin: 1rem 0;
+    .subpart {
+      margin-bottom: 3rem;
     }
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
-      color: var(--muted);
+    .subpart h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .subpart p {
+      margin-bottom: 1rem;
+      color: #374151;
+    }
+    .images {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .images img {
+      width: 48%;
+      background: #e5e7eb;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+    }
+    .desc {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      color: #4b5563;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Project 0: Getting Started</h1>
-    <p>CS 180 • by <strong>sufjanf</strong></p>
-    <nav>
-      <a href="/">⇦ Back to Home</a>
-      <a href="https://github.com/sufjanf/sufjanf.github.io/tree/main/project0" target="_blank">Source Code</a>
-    </nav>
-  </header>
+  <h1>Project 0: Becoming Friends with Your Camera</h1>
 
-  <main>
-    <h2>Overview</h2>
-    <p>This is the write-up for Project 0. It introduces the workflow for CS 180 projects and demonstrates a simple result hosted on GitHub Pages.</p>
+  <section class="subpart">
+    <h2>Subpart 1: [Placeholder Title]</h2>
+    <p>[One sentence placeholder]</p>
+    <div class="images">
+      <img src="placeholder1a.jpg" alt="Placeholder image 1a">
+      <img src="placeholder1b.jpg" alt="Placeholder image 1b">
+    </div>
+    <div class="desc">
+      <p>[Description under first image]</p>
+      <p>[Description under second image]</p>
+    </div>
+  </section>
 
-    <h2>Results</h2>
-    <p>Below is an example result image (placeholder):</p>
-    <img src="https://via.placeholder.com/600x300.png?text=Project+0+Result" alt="Project 0 Output">
+  <section class="subpart">
+    <h2>Subpart 2: [Placeholder Title]</h2>
+    <p>[One sentence placeholder]</p>
+    <div class="images">
+      <img src="placeholder2a.jpg" alt="Placeholder image 2a">
+      <img src="placeholder2b.jpg" alt="Placeholder image 2b">
+    </div>
+    <div class="desc">
+      <p>[Description under first image]</p>
+      <p>[Description under second image]</p>
+    </div>
+  </section>
 
-    <h2>Write-Up</h2>
-    <h3>Approach</h3>
-    <p>Explain your methodology, tools, and algorithms here.</p>
-
-    <h3>Experiments</h3>
-    <ul>
-      <li>Experiment A — description and findings.</li>
-      <li>Experiment B — description and findings.</li>
-    </ul>
-
-    <h3>Discussion</h3>
-    <p>Discuss limitations, what worked well, and future improvements.</p>
-
-    <h2>References</h2>
-    <ul>
-      <li>Lecture notes, research papers, or documentation you used.</li>
-    </ul>
-  </main>
-
-  <footer>
-    <p>© <span id="year"></span> sufjanf</p>
-  </footer>
-
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+  <section class="subpart">
+    <h2>Subpart 3: [Placeholder Title]</h2>
+    <p>[One sentence placeholder]</p>
+    <div class="images">
+      <img src="placeholder3a.jpg" alt="Placeholder image 3a">
+      <img src="placeholder3b.jpg" alt="Placeholder image 3b">
+    </div>
+    <div class="desc">
+      <p>[Description under first image]</p>
+      <p>[Description under second image]</p>
+    </div>
+  </section>
 </body>
 </html>
