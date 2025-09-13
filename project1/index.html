@@ -54,15 +54,15 @@
       <div class="card flow">
         <p>
           We reconstruct color images from Prokudin-Gorskii glass plates by splitting the vertically stacked <span class="mono">B, G, R</span> exposures and aligning
-          <span class="mono">G</span> and <span class="mono">R</span> to <span class="mono">B</span> with an integer translation. The thumbnails below are the original black‑and‑white stacked
+          <span class="mono">G</span> and <span class="mono">R</span> to <span class="mono">B</span> with an integer translation. The thumbnails below are the original black-and-white stacked
           plates (inputs), from which the colored outputs are generated. We implement two alignment procedures: a
           <span class="pill">Single-Scale</span> exhaustive search for small JPGs, and a <span class="pill">Multi-Scale Pyramid</span> method for large TIFFs. Matching uses
           robust metrics (NCC or L2/SSD) on the common interior.
         </p>
         <div class="thumbs">
-          <img src="out/cathedral_bw.jpg" alt="cathedral original stacked plate" />
-          <img src="out/monastery_bw.jpg" alt="monastery original stacked plate" />
-          <img src="out/tobolsk_bw.jpg" alt="tobolsk original stacked plate" />
+          <img src="assets/cathedral_bw.jpg" alt="cathedral original stacked plate" />
+          <img src="assets/monastery_bw.jpg" alt="monastery original stacked plate" />
+          <img src="assets/tobolsk_bw.jpg" alt="tobolsk original stacked plate" />
         </div>
       </div>
     </section>
@@ -83,9 +83,9 @@
           contaminate the composite.
         </p>
         <div class="thumbs">
-          <img src="out/cathedral_single_ncc.jpg" alt="cathedral single" />
-          <img src="out/monastery_single_ncc.jpg" alt="monastery single" />
-          <img src="out/tobolsk_single_ncc.jpg" alt="tobolsk single" />
+          <img src="assets/cathedral_single_ncc.jpg" alt="cathedral single" />
+          <img src="assets/monastery_single_ncc.jpg" alt="monastery single" />
+          <img src="assets/tobolsk_single_ncc.jpg" alt="tobolsk single" />
         </div>
       </div>
     </section>
@@ -126,9 +126,9 @@
           alignments on some textures. 
         </p>
         <div class="thumbs">
-          <img src="out/emir_pyramid_ncc.jpg" alt="emir pyramid" />
-          <img src="out/harvesters_pyramid_ncc.jpg" alt="harvesters pyramid" />
-          <img src="out/self_portrait_pyramid_ncc.jpg" alt="self portrait pyramid" />
+          <img src="assets/emir_pyramid_ncc.jpg" alt="emir pyramid" />
+          <img src="assets/harvesters_pyramid_ncc.jpg" alt="harvesters pyramid" />
+          <img src="assets/self_portrait_pyramid_ncc.jpg" alt="self portrait pyramid" />
         </div>
       </div>
     </section>
@@ -138,21 +138,21 @@
       <div class="grid">
         <!-- Single-scale (low-res) -->
         <figure>
-          <img src="out/cathedral_single_ncc.jpg" alt="cathedral single" />
+          <img src="assets/cathedral_single_ncc.jpg" alt="cathedral single" />
           <figcaption>
             <div class="figtitle">cathedral single-scale (NCC)</div>
             <div>G shift (dx,dy) = (+2, +5); R shift (dx,dy) = (+1, +5)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/monastery_single_ncc.jpg" alt="monastery single" />
+          <img src="assets/monastery_single_ncc.jpg" alt="monastery single" />
           <figcaption>
             <div class="figtitle">monastery single-scale (NCC)</div>
             <div>G shift (dx,dy) = (+2, -3); R shift (dx,dy) = (+2, +3)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/tobolsk_single_ncc.jpg" alt="tobolsk single" />
+          <img src="assets/tobolsk_single_ncc.jpg" alt="tobolsk single" />
           <figcaption>
             <div class="figtitle">tobolsk single-scale (NCC)</div>
             <div>G shift (dx,dy) = (+3, +3); R shift (dx,dy) = (+3, +5)</div>
@@ -161,98 +161,98 @@
 
         <!-- Pyramid (all) -->
         <figure>
-          <img src="out/cathedral_pyramid_ncc.jpg" alt="cathedral pyramid" />
+          <img src="assets/cathedral_pyramid_ncc.jpg" alt="cathedral pyramid" />
           <figcaption>
             <div class="figtitle">cathedral pyramid (NCC)</div>
             <div>G (+2, +5); R (+3, +12)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/church_pyramid_ncc.jpg" alt="church pyramid" />
+          <img src="assets/church_pyramid_ncc.jpg" alt="church pyramid" />
           <figcaption>
             <div class="figtitle">church pyramid (NCC)</div>
             <div>G (+4, +25); R (-4, +58)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/emir_pyramid_ncc.jpg" alt="emir pyramid" />
+          <img src="assets/emir_pyramid_ncc.jpg" alt="emir pyramid" />
           <figcaption>
             <div class="figtitle">emir pyramid (NCC)</div>
             <div>G (+24, +49); R (-375, +111)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/harvesters_pyramid_ncc.jpg" alt="harvesters pyramid" />
+          <img src="assets/harvesters_pyramid_ncc.jpg" alt="harvesters pyramid" />
           <figcaption>
             <div class="figtitle">harvesters pyramid (NCC)</div>
             <div>G (+18, +60); R (+14, +123)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/icon_pyramid_ncc.jpg" alt="icon pyramid" />
+          <img src="assets/icon_pyramid_ncc.jpg" alt="icon pyramid" />
           <figcaption>
             <div class="figtitle">icon pyramid (NCC)</div>
             <div>G (+17, +41); R (+23, +90)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/italil_pyramid_ncc.jpg" alt="italil pyramid" />
+          <img src="assets/italil_pyramid_ncc.jpg" alt="italil pyramid" />
           <figcaption>
             <div class="figtitle">italil pyramid (NCC)</div>
             <div>G (+22, +38); R (+36, +77)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/lastochikino_pyramid_ncc.jpg" alt="lastochikino pyramid" />
+          <img src="assets/lastochikino_pyramid_ncc.jpg" alt="lastochikino pyramid" />
           <figcaption>
             <div class="figtitle">lastochikino pyramid (NCC)</div>
             <div>G (-2, -3); R (-8, +76)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/lugano_pyramid_ncc.jpg" alt="lugano pyramid" />
+          <img src="assets/lugano_pyramid_ncc.jpg" alt="lugano pyramid" />
           <figcaption>
             <div class="figtitle">lugano pyramid (NCC)</div>
             <div>G (-17, +41); R (-29, +92)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/melons_pyramid_ncc.jpg" alt="melons pyramid" />
+          <img src="assets/melons_pyramid_ncc.jpg" alt="melons pyramid" />
           <figcaption>
             <div class="figtitle">melons pyramid (NCC)</div>
             <div>G (+10, +80); R (+13, +177)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/monastery_pyramid_ncc.jpg" alt="monastery pyramid" />
+          <img src="assets/monastery_pyramid_ncc.jpg" alt="monastery pyramid" />
           <figcaption>
             <div class="figtitle">monastery pyramid (NCC)</div>
             <div>G (+2, -3); R (+2, +3)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/self_portrait_pyramid_ncc.jpg" alt="self portrait pyramid" />
+          <img src="assets/self_portrait_pyramid_ncc.jpg" alt="self portrait pyramid" />
           <figcaption>
             <div class="figtitle">self_portrait pyramid (NCC)</div>
             <div>G (+29, +78); R (+37, +176)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/siren_pyramid_ncc.jpg" alt="siren pyramid" />
+          <img src="assets/siren_pyramid_ncc.jpg" alt="siren pyramid" />
           <figcaption>
             <div class="figtitle">siren pyramid (NCC)</div>
             <div>G (-6, +49); R (-24, +96)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/three_generations_pyramid_ncc.jpg" alt="three generations pyramid" />
+          <img src="assets/three_generations_pyramid_ncc.jpg" alt="three generations pyramid" />
           <figcaption>
             <div class="figtitle">three_generations pyramid (NCC)</div>
             <div>G (+13, +53); R (+9, +111)</div>
           </figcaption>
         </figure>
         <figure>
-          <img src="out/tobolsk_pyramid_ncc.jpg" alt="tobolsk pyramid" />
+          <img src="assets/tobolsk_pyramid_ncc.jpg" alt="tobolsk pyramid" />
           <figcaption>
             <div class="figtitle">tobolsk pyramid (NCC)</div>
             <div>G (+3, +3); R (+3, +6)</div>
