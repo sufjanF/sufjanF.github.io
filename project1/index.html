@@ -1,108 +1,265 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Project 1: Images of the Russian empire</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Images of the Russian Empire: Colorizing the Prokudin-Gorskii Photo Collection</title>
   <style>
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background: #f9fafb;
-      color: #111827;
+    :root {
+      --bg: #ffffff;
+      --card: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #0ea5e9;
+      --accent-2: #0284c7;
+      --border: #e2e8f0;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .subpart {
-      margin-bottom: 2.5rem;
-    }
-    .subpart h2 {
-      font-size: 1.25rem;
-      margin-bottom: 0.5rem;
-    }
-    .subpart p {
-      margin-bottom: 0.75rem;
-      color: #374151;
-    }
-    .images {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 0.25rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .images img {
-      max-width: 45%;
-      height: auto;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      background: #e5e7eb;
-    }
-    .images.single img {
-      max-width: 60%;
-    }
-    .desc {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.9rem;
-      color: #4b5563;
-      margin-top: 0.2rem;
-    }
-    .desc p {
-      margin: 0;
-      flex: 1;
-      text-align: center;
-    }
-    .desc.single {
-      display: block;
-      text-align: center;
-      margin-top: 0.3rem;
-    }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size: 15px; }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+    header h1 { font-weight: 800; letter-spacing: 0.2px; line-height: 1.15; margin: 0 0 4px; font-size: clamp(26px, 3.5vw, 40px); }
+    header p { margin: 0; color: var(--muted); font-size: 15px; }
+    section { margin-top: 40px; }
+  h2 { font-size: 22px; margin: 0 0 12px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px; }
+    .flow > * + * { margin-top: 12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    figure { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 0; display: flex; flex-direction: column; }
+    figure img { width: 100%; height: 200px; object-fit: cover; display: block; background: #f1f5f9; }
+    figcaption { padding: 10px 12px 12px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--border); }
+    .figtitle { color: var(--text); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+
+    .callout { border-left: 3px solid var(--accent); padding: 10px 12px; background: #e0f2fe; border-radius: 6px; color: #0c4a6e; }
+    .pill { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; font-size: 12px; color: var(--muted); background: #fff; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .spacer { height: 6px; }
+    .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .thumbs img { width: 100%; height: 160px; object-fit: cover; border: 1px solid var(--border); border-radius: 10px; background: #f1f5f9; }
+    /* Keep subtle color but use normal body size for consistency */
+    .subtle { color: var(--muted); }
   </style>
 </head>
 <body>
-  <h1>Project 1: Images of the Russian empire</h1>
+  <div class="wrap">
+    <header>
+      <h1>Images of the Russian Empire: Colorizing the Prokudin-Gorskii Photo Collection</h1>
+      <p>Automatic colorization by aligning the B, G, and R exposures from scanned glass plates.</p>
+    </header>
 
-  <section class="subpart">
-    <h2>Subheading here</h2>
-    <p>Introductory description text goes here.</p>
-    <div class="images">
-      <img src="assets/image1.png" alt="Placeholder image 1">
-      <img src="assets/image2.png" alt="Placeholder image 2">
-    </div>
-    <div class="desc">
-      <p>Description under first image</p>
-      <p>Description under second image</p>
-    </div>
-  </section>
+    <section id="overview">
+      <h2>Overview</h2>
+      <div class="card flow">
+        <p>
+          We reconstruct color images from Prokudin-Gorskii glass plates by splitting the vertically stacked <span class="mono">B, G, R</span> exposures and aligning
+          <span class="mono">G</span> and <span class="mono">R</span> to <span class="mono">B</span> with an integer translation. The thumbnails below are the original black‑and‑white stacked
+          plates (inputs), from which the colored outputs are generated. We implement two alignment procedures: a
+          <span class="pill">Single-Scale</span> exhaustive search for small JPGs, and a <span class="pill">Multi-Scale Pyramid</span> method for large TIFFs. Matching uses
+          robust metrics (NCC or L2/SSD) on the common interior.
+        </p>
+        <div class="thumbs">
+          <img src="out/cathedral_bw.jpg" alt="cathedral original stacked plate" />
+          <img src="out/monastery_bw.jpg" alt="monastery original stacked plate" />
+          <img src="out/tobolsk_bw.jpg" alt="tobolsk original stacked plate" />
+        </div>
+      </div>
+    </section>
 
-  <section class="subpart">
-    <h2>Subheading here</h2>
-    <p>Introductory description text goes here.</p>
-    <div class="images">
-      <img src="assets/image3.png" alt="Placeholder image 3">
-      <img src="assets/image4.png" alt="Placeholder image 4">
-    </div>
-    <div class="desc">
-      <p>Description under first image</p>
-      <p>Description under second image</p>
-    </div>
-  </section>
+    <section id="single">
+      <h2>Single-Scale Alignment</h2>
+      <div class="card flow">
+        <p>
+          For small images, we exhaustively search a compact shift window (e.g., <span class="mono">[-5, 5]</span>) and choose the best-scoring displacement
+          using <span class="mono">NCC</span> or <span class="mono">L2/SSD</span>. The winning integer shifts are applied to <span class="mono">G</span> and <span class="mono">R</span>, and the result is
+          cropped to a common interior to avoid seams.
+        </p>
+        <p>
+          Concretely, for each candidate (dy, dx) in the window, we compare the target channel against the reference over their overlapping interior while
+          ignoring a small border (≈10%) to suppress scanning artifacts and roll-induced wraparound. <span class="mono">NCC</span> measures similarity after mean removal and
+          L2 normalization, favoring strong correlation of structure; <span class="mono">L2/SSD</span> minimizes raw intensity differences. We select the displacement that
+          optimizes the chosen metric and apply it as an integer translation. Finally, channels are cropped to a shared valid region so that no wrapped pixels
+          contaminate the composite.
+        </p>
+        <div class="thumbs">
+          <img src="out/cathedral_single_ncc.jpg" alt="cathedral single" />
+          <img src="out/monastery_single_ncc.jpg" alt="monastery single" />
+          <img src="out/tobolsk_single_ncc.jpg" alt="tobolsk single" />
+        </div>
+      </div>
+    </section>
 
-  <section class="subpart">
-    <h2>Subheading here</h2>
-    <p>Introductory description text goes here.</p>
-    <div class="images single">
-      <img src="assets/image5.png" alt="Placeholder single image">
-    </div>
-    <div class="desc single">
-      <p>Description under single image</p>
-    </div>
-  </section>
+    <section id="pyramid">
+      <h2>Multi-Scale Pyramid Alignment</h2>
+      <div class="card flow">
+        <p>
+          For high-resolution TIFFs, full-resolution search is expensive. We build a pyramid by repeatedly downsampling (×0.5) until the smallest
+          dimension is modest (≈300px). Starting at the coarsest level, we estimate the shift with an exhaustive search, then propagate and refine
+          that estimate at each finer level. This coarse-to-fine strategy recovers large translations efficiently and robustly.
+        </p>
+        <div class="callout flow">
+          <div class="row"><span class="pill">Step 1</span><span>Split the plate into B, G, R.</span></div>
+          <div class="row"><span class="pill">Step 2</span><span>Build image pyramids for each channel (scale 0.5 per level).</span></div>
+          <div class="row"><span class="pill">Step 3</span><span>At the coarsest level, run an exhaustive search to align G→B and R→B.</span></div>
+          <div class="row"><span class="pill">Step 4</span><span>Upsample the estimated (dy, dx) to the next level and refine in a small window.</span></div>
+          <div class="row"><span class="pill">Step 5</span><span>Score candidates with either NCC or L2/SSD on the overlapping interior.</span></div>
+          <div class="row"><span class="pill">Step 6</span><span>Apply the best integer shifts and crop to a shared interior region.</span></div>
+        </div>
+        <div class="flow">
+          <div class="row">
+            <span class="pill">NCC</span>
+            <span class="mono">score = ⟨Â, B̂⟩, using mean-subtracted and L2-normalized patches</span>
+          </div>
+          <div class="row">
+            <span class="pill">L2</span>
+            <span class="mono">score = Σ (A − B)^2, minimized over the common overlap</span>
+          </div>
+        </div>
+        <p>
+          We ignore a small border (≈10%) when scoring to reduce the influence of scanning borders and wrapped pixels. The best-scoring shift for
+          <span class="mono">G</span> and <span class="mono">R</span> is applied with integer translation, and the image is cropped to a common interior.
+        </p>
+        <p>
+          Why is <span class="mono">emir</span> the only image imperfectly aligned? The color channels for the Emir portrait differ significantly in exposure and
+          tonality (especially in the red channel across the robe and background). This causes raw-intensity metrics (NCC/L2) to prefer incorrect
+          alignments on some textures. 
+        </p>
+        <div class="thumbs">
+          <img src="out/emir_pyramid_ncc.jpg" alt="emir pyramid" />
+          <img src="out/harvesters_pyramid_ncc.jpg" alt="harvesters pyramid" />
+          <img src="out/self_portrait_pyramid_ncc.jpg" alt="self portrait pyramid" />
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery">
+      <h2>Generated Images Gallery</h2>
+      <div class="grid">
+        <!-- Single-scale (low-res) -->
+        <figure>
+          <img src="out/cathedral_single_ncc.jpg" alt="cathedral single" />
+          <figcaption>
+            <div class="figtitle">cathedral single-scale (NCC)</div>
+            <div>G shift (dx,dy) = (+2, +5); R shift (dx,dy) = (+1, +5)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/monastery_single_ncc.jpg" alt="monastery single" />
+          <figcaption>
+            <div class="figtitle">monastery single-scale (NCC)</div>
+            <div>G shift (dx,dy) = (+2, -3); R shift (dx,dy) = (+2, +3)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/tobolsk_single_ncc.jpg" alt="tobolsk single" />
+          <figcaption>
+            <div class="figtitle">tobolsk single-scale (NCC)</div>
+            <div>G shift (dx,dy) = (+3, +3); R shift (dx,dy) = (+3, +5)</div>
+          </figcaption>
+        </figure>
+
+        <!-- Pyramid (all) -->
+        <figure>
+          <img src="out/cathedral_pyramid_ncc.jpg" alt="cathedral pyramid" />
+          <figcaption>
+            <div class="figtitle">cathedral pyramid (NCC)</div>
+            <div>G (+2, +5); R (+3, +12)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/church_pyramid_ncc.jpg" alt="church pyramid" />
+          <figcaption>
+            <div class="figtitle">church pyramid (NCC)</div>
+            <div>G (+4, +25); R (-4, +58)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/emir_pyramid_ncc.jpg" alt="emir pyramid" />
+          <figcaption>
+            <div class="figtitle">emir pyramid (NCC)</div>
+            <div>G (+24, +49); R (-375, +111)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/harvesters_pyramid_ncc.jpg" alt="harvesters pyramid" />
+          <figcaption>
+            <div class="figtitle">harvesters pyramid (NCC)</div>
+            <div>G (+18, +60); R (+14, +123)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/icon_pyramid_ncc.jpg" alt="icon pyramid" />
+          <figcaption>
+            <div class="figtitle">icon pyramid (NCC)</div>
+            <div>G (+17, +41); R (+23, +90)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/italil_pyramid_ncc.jpg" alt="italil pyramid" />
+          <figcaption>
+            <div class="figtitle">italil pyramid (NCC)</div>
+            <div>G (+22, +38); R (+36, +77)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/lastochikino_pyramid_ncc.jpg" alt="lastochikino pyramid" />
+          <figcaption>
+            <div class="figtitle">lastochikino pyramid (NCC)</div>
+            <div>G (-2, -3); R (-8, +76)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/lugano_pyramid_ncc.jpg" alt="lugano pyramid" />
+          <figcaption>
+            <div class="figtitle">lugano pyramid (NCC)</div>
+            <div>G (-17, +41); R (-29, +92)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/melons_pyramid_ncc.jpg" alt="melons pyramid" />
+          <figcaption>
+            <div class="figtitle">melons pyramid (NCC)</div>
+            <div>G (+10, +80); R (+13, +177)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/monastery_pyramid_ncc.jpg" alt="monastery pyramid" />
+          <figcaption>
+            <div class="figtitle">monastery pyramid (NCC)</div>
+            <div>G (+2, -3); R (+2, +3)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/self_portrait_pyramid_ncc.jpg" alt="self portrait pyramid" />
+          <figcaption>
+            <div class="figtitle">self_portrait pyramid (NCC)</div>
+            <div>G (+29, +78); R (+37, +176)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/siren_pyramid_ncc.jpg" alt="siren pyramid" />
+          <figcaption>
+            <div class="figtitle">siren pyramid (NCC)</div>
+            <div>G (-6, +49); R (-24, +96)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/three_generations_pyramid_ncc.jpg" alt="three generations pyramid" />
+          <figcaption>
+            <div class="figtitle">three_generations pyramid (NCC)</div>
+            <div>G (+13, +53); R (+9, +111)</div>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="out/tobolsk_pyramid_ncc.jpg" alt="tobolsk pyramid" />
+          <figcaption>
+            <div class="figtitle">tobolsk pyramid (NCC)</div>
+            <div>G (+3, +3); R (+3, +6)</div>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
