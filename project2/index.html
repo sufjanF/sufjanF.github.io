@@ -108,15 +108,15 @@
             <h4>Figure 1: Selfie inputs and box blur</h4>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part1_1_selfie_color.png" alt="Original colour selfie" />
+                <img src="assets/images_part1_1_selfie_color.png" alt="Original colour selfie" />
                 <figcaption>Colour source image before any processing.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_1_selfie_grayscale.png" alt="Grayscale selfie" />
+                <img src="assets/images_part1_1_selfie_grayscale.png" alt="Grayscale selfie" />
                 <figcaption>Grayscale conversion used for all convolution tests.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_1_selfie_box_blur.png" alt="Selfie filtered with a 9x9 box filter using manual convolution" />
+                <img src="assets/images_part1_1_selfie_box_blur.png" alt="Selfie filtered with a 9x9 box filter using manual convolution" />
                 <figcaption>9×9 box blur created with the hand written routine.</figcaption>
               </figure>
             </div>
@@ -124,20 +124,20 @@
           <div class="figure-block">
             <h4>Figure 2: Manual convolution diagnostics</h4>
             <figure class="hero-figure">
-              <img src="site_images/images_part1_1_selfie_box_diff.png" alt="Absolute difference between manual and SciPy convolution results" />
+              <img src="assets/images_part1_1_selfie_box_diff.png" alt="Absolute difference between manual and SciPy convolution results" />
               <figcaption>Absolute difference between my result and SciPy. The exaggeration comes from gamma 4 scaling so the tiny residuals become visible.</figcaption>
             </figure>
             <div class="figure-grid tight">
               <figure>
-                <img src="site_images/images_part1_1_selfie_dx.png" alt="Finite difference response in the x-direction" />
+                <img src="assets/images_part1_1_selfie_dx.png" alt="Finite difference response in the x-direction" />
                 <figcaption>Central difference filter <span class="mono">D<sub>x</sub> = [1, 0, -1]</span> applied to the selfie.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_1_selfie_dy.png" alt="Finite difference response in the y-direction" />
+                <img src="assets/images_part1_1_selfie_dy.png" alt="Finite difference response in the y-direction" />
                 <figcaption>The matching <span class="mono">D<sub>y</sub></span> response with signed visualisation.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_1_selfie_box_diff_two_vs_scipy.png" alt="Difference between two-loop convolution and SciPy" />
+                <img src="assets/images_part1_1_selfie_box_diff_two_vs_scipy.png" alt="Difference between two-loop convolution and SciPy" />
                 <figcaption>Two loop method compared with SciPy. Residual speckles stay near machine precision.</figcaption>
               </figure>
             </div>
@@ -198,11 +198,11 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 3: Cameraman partial derivatives</h4>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part1_2_cameraman_dx.png" alt="Cameraman derivative in x" />
+                <img src="assets/images_part1_2_cameraman_dx.png" alt="Cameraman derivative in x" />
                 <figcaption><span class="mono">D<sub>x</sub></span> response. Vertical edges glow while horizontals recede.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_2_cameraman_dy.png" alt="Cameraman derivative in y" />
+                <img src="assets/images_part1_2_cameraman_dy.png" alt="Cameraman derivative in y" />
                 <figcaption><span class="mono">D<sub>y</sub></span> response. Rooftops and horizon lines light up.</figcaption>
               </figure>
             </div>
@@ -211,11 +211,11 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 4: Gradient magnitude and binarised edges</h4>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part1_2_cameraman_grad_mag.png" alt="Gradient magnitude for cameraman" />
+                <img src="assets/images_part1_2_cameraman_grad_mag.png" alt="Gradient magnitude for cameraman" />
                 <figcaption>Gradient magnitude combines both partials and reveals halos around the main structures.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_2_cameraman_edges.png" alt="Thresholded edge map for cameraman" />
+                <img src="assets/images_part1_2_cameraman_edges.png" alt="Thresholded edge map for cameraman" />
                 <figcaption>Binary edge map at threshold 0.12. Noise drops while the tower remains crisp.</figcaption>
               </figure>
             </div>
@@ -251,15 +251,15 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 5: Filters used in the DoG pipeline</h4>
             <div class="figure-grid tight">
               <figure>
-                <img src="site_images/images_part1_3_gaussian_kernel.png" alt="Gaussian kernel heatmap" />
+                <img src="assets/images_part1_3_gaussian_kernel.png" alt="Gaussian kernel heatmap" />
                 <figcaption>7×7 Gaussian kernel (σ = 1.4).</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_dog_filter_dx.png" alt="Derivative-of-Gaussian filter in x" />
+                <img src="assets/images_part1_3_dog_filter_dx.png" alt="Derivative-of-Gaussian filter in x" />
                 <figcaption>DoG filter <span class="mono">G * D<sub>x</sub></span> visualised.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_dog_filter_dy.png" alt="Derivative-of-Gaussian filter in y" />
+                <img src="assets/images_part1_3_dog_filter_dy.png" alt="Derivative-of-Gaussian filter in y" />
                 <figcaption>DoG filter <span class="mono">G * D<sub>y</sub></span>.</figcaption>
               </figure>
             </div>
@@ -267,24 +267,24 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
           <div class="figure-block">
             <h4>Figure 6: Blurring before finite differences</h4>
             <figure class="hero-figure">
-              <img src="site_images/images_part1_3_cameraman_gaussian_blur.png" alt="Gaussian blurred cameraman" />
+              <img src="assets/images_part1_3_cameraman_gaussian_blur.png" alt="Gaussian blurred cameraman" />
               <figcaption>Gaussian-blurred cameraman (less sensor noise, edges remain).</figcaption>
             </figure>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part1_3_cameraman_blur_dx.png" alt="Derivative after Gaussian blur in x" />
+                <img src="assets/images_part1_3_cameraman_blur_dx.png" alt="Derivative after Gaussian blur in x" />
                 <figcaption>Derivative of the blurred image along x.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_cameraman_blur_dy.png" alt="Derivative after Gaussian blur in y" />
+                <img src="assets/images_part1_3_cameraman_blur_dy.png" alt="Derivative after Gaussian blur in y" />
                 <figcaption>Derivative of the blurred image along y.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_cameraman_blur_grad_mag.png" alt="Gradient magnitude after Gaussian blur" />
+                <img src="assets/images_part1_3_cameraman_blur_grad_mag.png" alt="Gradient magnitude after Gaussian blur" />
                 <figcaption>Gradient magnitude post smoothing (fewer halo artifacts).</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_cameraman_blur_edges.png" alt="Edge map after Gaussian blur" />
+                <img src="assets/images_part1_3_cameraman_blur_edges.png" alt="Edge map after Gaussian blur" />
                 <figcaption>Thresholded edges (noticeably cleaner than Part&nbsp;1.2).</figcaption>
               </figure>
             </div>
@@ -293,19 +293,19 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 7: Direct DoG responses</h4>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part1_3_cameraman_dog_dx.png" alt="Derivative-of-Gaussian response in x" />
+                <img src="assets/images_part1_3_cameraman_dog_dx.png" alt="Derivative-of-Gaussian response in x" />
                 <figcaption>Single-pass DoG response along x.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_cameraman_dog_dy.png" alt="Derivative-of-Gaussian response in y" />
+                <img src="assets/images_part1_3_cameraman_dog_dy.png" alt="Derivative-of-Gaussian response in y" />
                 <figcaption>Single-pass DoG response along y.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_cameraman_dog_grad_mag.png" alt="DoG gradient magnitude" />
+                <img src="assets/images_part1_3_cameraman_dog_grad_mag.png" alt="DoG gradient magnitude" />
                 <figcaption>DoG gradient magnitude (matches the blurred pipeline).</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part1_3_cameraman_dog_edges.png" alt="DoG edge map" />
+                <img src="assets/images_part1_3_cameraman_dog_edges.png" alt="DoG edge map" />
                 <figcaption>DoG edge map (identical to the blurred version except at the padded frame).</figcaption>
               </figure>
             </div>
@@ -386,19 +386,19 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 8: Taj Mahal sharpening pipeline</h4>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part2_1_taj_original.png" alt="Original Taj Mahal image" />
+                <img src="assets/images_part2_1_taj_original.png" alt="Original Taj Mahal image" />
                 <figcaption>Original Taj Mahal photo.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_taj_blurred.png" alt="Taj Mahal blurred with Gaussian" />
+                <img src="assets/images_part2_1_taj_blurred.png" alt="Taj Mahal blurred with Gaussian" />
                 <figcaption>Gaussian blur that keeps only the low frequencies.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_taj_high_frequency.png" alt="High-frequency residual for the Taj Mahal" />
+                <img src="assets/images_part2_1_taj_high_frequency.png" alt="High-frequency residual for the Taj Mahal" />
                 <figcaption>Signed high frequency residual with zero mapped to mid grey.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_taj_sharpened_1.0.png" alt="Sharpened Taj Mahal image" />
+                <img src="assets/images_part2_1_taj_sharpened_1.0.png" alt="Sharpened Taj Mahal image" />
                 <figcaption>Sharpened result with κ 1.0. Marble carvings pop without obvious ringing.</figcaption>
               </figure>
             </div>
@@ -407,15 +407,15 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 9: Sharpening amount sweep on the Taj Mahal</h4>
             <div class="figure-grid tight">
               <figure>
-                <img src="site_images/images_part2_1_taj_sharpened_0.5.png" alt="Taj Mahal sharpened with amount 0.5" />
+                <img src="assets/images_part2_1_taj_sharpened_0.5.png" alt="Taj Mahal sharpened with amount 0.5" />
                 <figcaption>κ 0.5 keeps the change subtle.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_taj_sharpened_1.0.png" alt="Taj Mahal sharpened with amount 1.0" />
+                <img src="assets/images_part2_1_taj_sharpened_1.0.png" alt="Taj Mahal sharpened with amount 1.0" />
                 <figcaption>κ 1.0 balances detail and artifacts.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_taj_sharpened_1.5.png" alt="Taj Mahal sharpened with amount 1.5" />
+                <img src="assets/images_part2_1_taj_sharpened_1.5.png" alt="Taj Mahal sharpened with amount 1.5" />
                 <figcaption>κ 1.5 introduces halos around the domes.</figcaption>
               </figure>
             </div>
@@ -424,33 +424,33 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             <h4>Figure 10: Bird sharpening comparison</h4>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part2_1_bird_original.png" alt="Original bird image" />
+                <img src="assets/images_part2_1_bird_original.png" alt="Original bird image" />
                 <figcaption>Original bird photo with soft focus.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_bird_blurred.png" alt="Blurred bird image" />
+                <img src="assets/images_part2_1_bird_blurred.png" alt="Blurred bird image" />
                 <figcaption>Gaussian blur used as the low pass reference.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_bird_high_frequency.png" alt="High-frequency residual for the bird" />
+                <img src="assets/images_part2_1_bird_high_frequency.png" alt="High-frequency residual for the bird" />
                 <figcaption>High frequency residual showing feather edges.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_bird_sharpened_1.2.png" alt="Sharpened bird image" />
+                <img src="assets/images_part2_1_bird_sharpened_1.2.png" alt="Sharpened bird image" />
                 <figcaption>Sharpened bird with κ 1.2 for a slightly stronger boost.</figcaption>
               </figure>
             </div>
             <div class="figure-grid tight">
               <figure>
-                <img src="site_images/images_part2_1_bird_sharpened_0.5.png" alt="Bird sharpened with amount 0.5" />
+                <img src="assets/images_part2_1_bird_sharpened_0.5.png" alt="Bird sharpened with amount 0.5" />
                 <figcaption>κ 0.5 provides a gentle lift.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_bird_sharpened_1.0.png" alt="Bird sharpened with amount 1.0" />
+                <img src="assets/images_part2_1_bird_sharpened_1.0.png" alt="Bird sharpened with amount 1.0" />
                 <figcaption>κ 1.0 recovers feather contrast without halos.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_bird_sharpened_1.5.png" alt="Bird sharpened with amount 1.5" />
+                <img src="assets/images_part2_1_bird_sharpened_1.5.png" alt="Bird sharpened with amount 1.5" />
                 <figcaption>κ 1.5 starts to amplify background noise.</figcaption>
               </figure>
             </div>
@@ -467,15 +467,15 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             </p>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part2_1_strawberry_original.png" alt="Original strawberry image" />
+                <img src="assets/images_part2_1_strawberry_original.png" alt="Original strawberry image" />
                 <figcaption>Original strawberry.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_strawberry_blurred.png" alt="Blurred strawberry image" />
+                <img src="assets/images_part2_1_strawberry_blurred.png" alt="Blurred strawberry image" />
                 <figcaption>Artificial blur simulating a defocused shot.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_1_strawberry_sharpened_1.0.png" alt="Sharpened strawberry image" />
+                <img src="assets/images_part2_1_strawberry_sharpened_1.0.png" alt="Sharpened strawberry image" />
                 <figcaption>Sharpened attempt with κ 1.0. Contrast improves but the small details stay soft.</figcaption>
               </figure>
             </div>
@@ -506,45 +506,45 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             </p>
             <div class="figure-grid tight">
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_fire_aligned.png" alt="Aligned fire input" />
+                <img src="assets/images_part2_2_bunny_fire_fire_aligned.png" alt="Aligned fire input" />
                 <figcaption>Aligned fire frame ready for low pass filtering.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_rabbit_aligned.png" alt="Aligned rabbit input" />
+                <img src="assets/images_part2_2_bunny_fire_rabbit_aligned.png" alt="Aligned rabbit input" />
                 <figcaption>Aligned rabbit frame handled as the high frequency source.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_fire_lowpass_sigma4.00.png" alt="Low-pass fire" />
+                <img src="assets/images_part2_2_bunny_fire_fire_lowpass_sigma4.00.png" alt="Low-pass fire" />
                 <figcaption>Fire after a Gaussian blur with σ 4.0.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_rabbit_highpass_sigma8.00.png" alt="High-pass rabbit" />
+                <img src="assets/images_part2_2_bunny_fire_rabbit_highpass_sigma8.00.png" alt="High-pass rabbit" />
                 <figcaption>Rabbit residual after subtracting a σ 8.0 blur.</figcaption>
               </figure>
             </div>
             <figure class="hero-figure">
-              <img src="site_images/images_part2_2_bunny_fire_bunny_fire_hybrid.png" alt="Hybrid bunny and fire" />
+              <img src="assets/images_part2_2_bunny_fire_bunny_fire_hybrid.png" alt="Hybrid bunny and fire" />
               <figcaption>Hybrid result. Rabbit detail stays at short viewing distances while flames take over at long range.</figcaption>
             </figure>
             <div class="figure-grid tight">
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_fire_fft_low_original.png" alt="Fire FFT" />
+                <img src="assets/images_part2_2_bunny_fire_fire_fft_low_original.png" alt="Fire FFT" />
                 <figcaption>Log magnitude of the original fire image.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_fire_fft_low_lowpass.png" alt="Fire low-pass FFT" />
+                <img src="assets/images_part2_2_bunny_fire_fire_fft_low_lowpass.png" alt="Fire low-pass FFT" />
                 <figcaption>After low pass filtering the spectrum collapses near the origin.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_rabbit_fft_high_original.png" alt="Rabbit FFT" />
+                <img src="assets/images_part2_2_bunny_fire_rabbit_fft_high_original.png" alt="Rabbit FFT" />
                 <figcaption>Rabbit spectrum contains energy across the full plane.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_rabbit_fft_high_highpass.png" alt="Rabbit high-pass FFT" />
+                <img src="assets/images_part2_2_bunny_fire_rabbit_fft_high_highpass.png" alt="Rabbit high-pass FFT" />
                 <figcaption>High pass residual emphasises the outer bands.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_bunny_fire_bunny_fire_fft_hybrid.png" alt="Hybrid FFT" />
+                <img src="assets/images_part2_2_bunny_fire_bunny_fire_fft_hybrid.png" alt="Hybrid FFT" />
                 <figcaption>Final hybrid spectrum blends the low centre with the rabbit's high frequency shell.</figcaption>
               </figure>
             </div>
@@ -559,15 +559,15 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             </p>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part2_2_derek_nutmeg_derek_aligned.png" alt="Aligned Derek" />
+                <img src="assets/images_part2_2_derek_nutmeg_derek_aligned.png" alt="Aligned Derek" />
                 <figcaption>Derek after alignment, serving as the low frequency anchor.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_derek_nutmeg_nutmeg_aligned.png" alt="Aligned Nutmeg" />
+                <img src="assets/images_part2_2_derek_nutmeg_nutmeg_aligned.png" alt="Aligned Nutmeg" />
                 <figcaption>Nutmeg aligned and ready for high frequency extraction.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_derek_nutmeg_derek_nutmeg_hybrid.png" alt="Derek Nutmeg hybrid" />
+                <img src="assets/images_part2_2_derek_nutmeg_derek_nutmeg_hybrid.png" alt="Derek Nutmeg hybrid" />
                 <figcaption>Hybrid: Derek is clear at close range, Nutmeg appears from afar.</figcaption>
               </figure>
             </div>
@@ -582,15 +582,15 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
             </p>
             <div class="figure-grid">
               <figure>
-                <img src="site_images/images_part2_2_cave_bear_cave_aligned.png" alt="Aligned cave" />
+                <img src="assets/images_part2_2_cave_bear_cave_aligned.png" alt="Aligned cave" />
                 <figcaption>Cave frame acting as the low pass channel.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_cave_bear_bear_aligned.png" alt="Aligned bear" />
+                <img src="assets/images_part2_2_cave_bear_bear_aligned.png" alt="Aligned bear" />
                 <figcaption>Bear frame aligned for high frequency detail.</figcaption>
               </figure>
               <figure>
-                <img src="site_images/images_part2_2_cave_bear_cave_bear_hybrid.png" alt="Cave bear hybrid" />
+                <img src="assets/images_part2_2_cave_bear_cave_bear_hybrid.png" alt="Cave bear hybrid" />
                 <figcaption>Hybrid scene. The bear hides in the cave's darkness until you get close.</figcaption>
               </figure>
             </div>
@@ -620,35 +620,35 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
           </p>
           <div class="figure-grid">
           <figure>
-            <img src="site_images/images_part2_3_paper_pair_apple_original.png" alt="Paper apple input" />
+            <img src="assets/images_part2_3_paper_pair_apple_original.png" alt="Paper apple input" />
             <figcaption>Paper apple scan (left of the step mask).</figcaption>
           </figure>
           <figure>
-            <img src="site_images/images_part2_3_paper_pair_orange_original.png" alt="Paper orange input" />
+            <img src="assets/images_part2_3_paper_pair_orange_original.png" alt="Paper orange input" />
             <figcaption>Paper orange scan (right of the step mask).</figcaption>
           </figure>
           <figure>
-            <img src="site_images/images_part2_3_paper_pair_oraple_blend.png" alt="Paper oraple blend" />
+            <img src="assets/images_part2_3_paper_pair_oraple_blend.png" alt="Paper oraple blend" />
             <figcaption>Recreation of the paper’s oraple using the scanned pair.</figcaption>
           </figure>
           </div>
           <div class="figure-grid">
             <figure>
-              <img src="site_images/images_part2_3_apple_original.png" alt="Original apple used for low/right blend" />
+              <img src="assets/images_part2_3_apple_original.png" alt="Original apple used for low/right blend" />
               <figcaption>Aligned apple input (left side of the step mask).</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_3_orange_original.png" alt="Original orange used for blend" />
+              <img src="assets/images_part2_3_orange_original.png" alt="Original orange used for blend" />
               <figcaption>Aligned orange input (right side of the step mask).</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_3_oraple_blend.png" alt="Final oraple blend" />
+              <img src="assets/images_part2_3_oraple_blend.png" alt="Final oraple blend" />
               <figcaption>Final oraple blend after summing the masked Laplacian stack.</figcaption>
             </figure>
           </div>
           <h4>Figure 3.42: Laplacian stack anatomy</h4>
           <figure class="hero-figure">
-            <img src="site_images/images_part2_3_figure342_grid.png" alt="Laplacian stack details mirroring Figure 3.42 from Burt &amp; Adelson" />
+            <img src="assets/images_part2_3_figure342_grid.png" alt="Laplacian stack details mirroring Figure 3.42 from Burt &amp; Adelson" />
             <figcaption>
               Top to bottom: high-, mid-, and low-frequency Laplacian bands (levels 0, 2, 4), followed by the
               reconstructed RGB images. Left column (a, d, g, j) is the apple weighted by the blurred mask;
@@ -696,19 +696,19 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
           </p>
           <div class="figure-grid tight">
             <figure>
-              <img src="site_images/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_a_aligned.png" alt="Aligned forest image" />
+              <img src="assets/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_a_aligned.png" alt="Aligned forest image" />
               <figcaption>Forest (upper region of the blend).</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_b_aligned.png" alt="Aligned sea image" />
+              <img src="assets/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_b_aligned.png" alt="Aligned sea image" />
               <figcaption>Sea (lower region of the blend).</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_forest_sea_horizontal_mask_smoothed.png" alt="Smoothed horizontal seam mask" />
+              <img src="assets/images_part2_4_forest_sea_horizontal_mask_smoothed.png" alt="Smoothed horizontal seam mask" />
               <figcaption>Smoothed horizontal mask, wide blur at coarse scales keeps the horizon gentle.</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_blend.png" alt="Forest and sea multiresolution blend" />
+              <img src="assets/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_blend.png" alt="Forest and sea multiresolution blend" />
               <figcaption>Result: the treeline fades into ocean mist without double exposure.</figcaption>
             </figure>
           </div>
@@ -725,41 +725,41 @@ def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
           </p>
           <div class="figure-grid tight">
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_sun_cone_irregular_a_aligned.png" alt="Aligned sun photograph" />
+              <img src="assets/images_part2_4_sun_cone_irregular_sun_cone_irregular_a_aligned.png" alt="Aligned sun photograph" />
               <figcaption>Aligned sun (image&nbsp;A): becomes the new scoop.</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_sun_cone_irregular_b_aligned.png" alt="Aligned ice-cream cone photograph" />
+              <img src="assets/images_part2_4_sun_cone_irregular_sun_cone_irregular_b_aligned.png" alt="Aligned ice-cream cone photograph" />
               <figcaption>Aligned cone (image&nbsp;B): supplies cone and background.</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_mask_smoothed.png" alt="Irregular mask for sun on cone" />
+              <img src="assets/images_part2_4_sun_cone_irregular_mask_smoothed.png" alt="Irregular mask for sun on cone" />
               <figcaption>Gaussian-smoothed irregular mask used at every level.</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_sun_cone_irregular_blend.png" alt="Sun on cone multiresolution blend" />
+              <img src="assets/images_part2_4_sun_cone_irregular_sun_cone_irregular_blend.png" alt="Sun on cone multiresolution blend" />
               <figcaption>Final blend: the sun softly nests into the cone with no hard edge.</figcaption>
             </figure>
           </div>
           <div class="figure-grid tight">
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_masked_a.png" alt="Masked sun input" />
+              <img src="assets/images_part2_4_sun_cone_irregular_masked_a.png" alt="Masked sun input" />
               <figcaption>Masked sun input (image&nbsp;A multiplied by the mask).</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_masked_b.png" alt="Masked cone input" />
+              <img src="assets/images_part2_4_sun_cone_irregular_masked_b.png" alt="Masked cone input" />
               <figcaption>Masked cone input (image&nbsp;B multiplied by 1−mask).</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_level_00_mixed_00.png" alt="Fine-level mixed Laplacian" />
+              <img src="assets/images_part2_4_sun_cone_irregular_level_00_mixed_00.png" alt="Fine-level mixed Laplacian" />
               <figcaption>Level&nbsp;0 (fine details): crisp highlight boundary stays sharp.</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_level_03_mixed_03.png" alt="Mid-level mixed Laplacian" />
+              <img src="assets/images_part2_4_sun_cone_irregular_level_03_mixed_03.png" alt="Mid-level mixed Laplacian" />
               <figcaption>Level&nbsp;3 (mid frequencies): the glow blends smoothly into the cone.</figcaption>
             </figure>
             <figure>
-              <img src="site_images/images_part2_4_sun_cone_irregular_level_05_mixed_05.png" alt="Coarse-level mixed Laplacian" />
+              <img src="assets/images_part2_4_sun_cone_irregular_level_05_mixed_05.png" alt="Coarse-level mixed Laplacian" />
               <figcaption>Level&nbsp;5 (coarsest residual): the broad illumination gently shifts between images.</figcaption>
             </figure>
           </div>
