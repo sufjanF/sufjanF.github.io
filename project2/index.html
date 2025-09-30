@@ -1,1 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fun with Filters and Frequencies! - CS180 Project 2 (fa25)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #0ea5e9;
+      --accent-2: #0284c7;
+      --border: #e2e8f0;
+    }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+    header h1 { font-weight: 800; letter-spacing: 0.2px; line-height: 1.15; margin: 0 0 4px; font-size: clamp(26px, 3.5vw, 40px); }
+    header p { margin: 0; color: var(--muted); font-size: 15px; }
+    section { margin-top: 40px; }
+    h2 { font-size: 22px; margin: 0 0 12px; }
+    h3 { font-size: 18px; margin: 0 0 10px; color: var(--muted); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px; }
+    .flow > * + * { margin-top: 12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .subtle { color: var(--muted); font-size: 13px; }
+    figure { margin: 0; }
+    figure img { display: block; width: 100%; max-width: 720px; margin: 0 auto; border-radius: 12px; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08); }
+    figure figcaption { margin-top: 8px; font-size: 14px; line-height: 1.35; color: var(--muted); text-align: center; }
+    .hero-figure img { max-width: min(100%, 720px); }
+    .figure-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); align-items: start; }
+    .figure-grid.tight { gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .figure-grid figure img { max-width: 100%; }
+    .figure-block { margin-top: 28px; }
+    .figure-block h4 { margin: 0 0 14px; font-size: 15px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    :not(pre) > code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.95em; background: rgba(148, 163, 184, 0.2); padding: 0.08em 0.4em; border-radius: 6px; }
+    .code-block { margin-top: 28px; border-radius: 14px; border: 1px solid rgba(148, 163, 184, 0.35); background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.94)); color: #e2e8f0; box-shadow: 0 18px 36px rgba(15, 23, 42, 0.22); overflow: hidden; }
+    .code-block-title { display: block; padding: 16px 20px 0; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(226, 232, 240, 0.82); }
+    .code-block pre { margin: 0; padding: 18px 20px 22px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 13px; line-height: 1.6; background: transparent; color: inherit; }
+    .code-block code { background: transparent; padding: 0; color: inherit; font-size: 0.95em; }
+    @media (max-width: 640px) {
+      .wrap { padding: 28px 16px 64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Fun with Filters and Frequencies!</h1>
+      <p>Using various methods to manipulate images.</p>
+    </header>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <div class="card flow">
+        <p>
+          This report captures my implementation of CS180 Project 2: Fun with Filters and Frequencies. Part 1
+          is about spatial filtering by hand, moving from manual convolution to finite differences and
+          ultimately Gaussian smoothing paired with derivatives. Part 2 builds on that foundation with unsharp
+          masking, hybrid image experiments, Gaussian and Laplacian stacks, and multiresolution blending that
+          includes the oraple remake along with blends of my own.
+        </p>
+        <p>
+          My biggest takeaway is how stack based blending changes the way I think about frequency. Writing Gaussian and Laplacian stacks made me notice that edges really live in middle bands, and
+          once they are isolated I can push them wherever they need to go. That mental model now guides every
+          choice of sigma or mask width.
+        </p>
+      </div>
+    </section>
+
+    <section id="part1">
+      <h2>Part 1: Fun with Filters</h2>
+      <div class="card flow">
+        <p>
+          This first half is about building intuition for spatial filters. I begin with
+          numpy versions of convolution so the math feels concrete, then roll those kernels into
+          derivative, smoothing, and frequency aware operators that set up the later parts of the project.
+        </p>
+        <p>
+          Along the way I added a small utility that saves arrays with predictable contrast stretches. It
+          can visualise signed outputs so zero stays at mid grey, and it can crop kernels to keep the
+          Gaussian and derivative of Gaussian views aligned in every figure.
+        </p>
+      </div>
+
+      <section id="part1-1">
+        <h3>Part 1.1: Convolutions from Scratch!</h3>
+        <div class="card flow">
+          <p>
+            Using two convolution routines that follow the textbook definition. The baseline
+            version loops over every pixel and kernel entry. The faster variant keeps only two loops and lets
+            NumPy handle the small inner block. Both use zero padding so border pixels see missing values as
+            black. When I compared the outputs with <span class="mono">scipy.signal.convolve2d</span> the largest absolute
+            difference was 1.4e-15, which is floating point noise.
+          </p>
+          <p>
+            Timing on my 1400×1000 selfie looked like this:
+          </p>
+          <ul>
+            <li>Four loop version: <strong>13.5 s</strong></li>
+            <li>Two loop version: <strong>2.0 s</strong></li>
+            <li>SciPy reference: <strong>0.08 s</strong></li>
+          </ul>
+          <div class="figure-block">
+            <h4>Figure 1: Selfie inputs and box blur</h4>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part1_1_selfie_color.png" alt="Original colour selfie" />
+                <figcaption>Colour source image before any processing.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_1_selfie_grayscale.png" alt="Grayscale selfie" />
+                <figcaption>Grayscale conversion used for all convolution tests.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_1_selfie_box_blur.png" alt="Selfie filtered with a 9x9 box filter using manual convolution" />
+                <figcaption>9×9 box blur created with the hand written routine.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 2: Manual convolution diagnostics</h4>
+            <figure class="hero-figure">
+              <img src="site_images/images_part1_1_selfie_box_diff.png" alt="Absolute difference between manual and SciPy convolution results" />
+              <figcaption>Absolute difference between my result and SciPy. The exaggeration comes from gamma 4 scaling so the tiny residuals become visible.</figcaption>
+            </figure>
+            <div class="figure-grid tight">
+              <figure>
+                <img src="site_images/images_part1_1_selfie_dx.png" alt="Finite difference response in the x-direction" />
+                <figcaption>Central difference filter <span class="mono">D<sub>x</sub> = [1, 0, -1]</span> applied to the selfie.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_1_selfie_dy.png" alt="Finite difference response in the y-direction" />
+                <figcaption>The matching <span class="mono">D<sub>y</sub></span> response with signed visualisation.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_1_selfie_box_diff_two_vs_scipy.png" alt="Difference between two-loop convolution and SciPy" />
+                <figcaption>Two loop method compared with SciPy. Residual speckles stay near machine precision.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="code-block">
+            <span class="code-block-title">Part 1.1 code</span>
+            <pre><code class="language-python">def pad_image(image: np.ndarray, kernel_shape: Sequence[int]) -> np.ndarray:
+  ky, kx = kernel_shape
+  assert ky % 2 == 1 and kx % 2 == 1, "Use odd-sized kernels for centered padding."
+  pad_y = ky // 2
+  pad_x = kx // 2
+  return np.pad(image, ((pad_y, pad_y), (pad_x, pad_x)), mode="constant")
+
+
+def convolve_four_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+  kernel_flipped = np.flipud(np.fliplr(kernel))
+  padded = pad_image(image, kernel.shape)
+  out = np.zeros_like(image)
+  for y in range(image.shape[0]):
+    for x in range(image.shape[1]):
+      acc = 0.0
+      for ky in range(kernel.shape[0]):
+        for kx in range(kernel.shape[1]):
+          acc += kernel_flipped[ky, kx] * padded[y + ky, x + kx]
+      out[y, x] = acc
+  return out
+
+
+def convolve_two_loops(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+  kernel_flipped = np.flipud(np.fliplr(kernel))
+  padded = pad_image(image, kernel.shape)
+  out = np.zeros_like(image)
+  k_y, k_x = kernel.shape
+  for y in range(image.shape[0]):
+    row_slice = padded[y : y + k_y]
+    for x in range(image.shape[1]):
+      out[y, x] = np.sum(row_slice[:, x : x + k_x] * kernel_flipped)
+  return out</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="part1-2">
+        <h3>Part 1.2: Finite Difference Operator</h3>
+        <div class="card flow">
+          <p>
+            First I show the partial derivatives in x and y for the cameraman photo by convolving the
+            image with the finite difference operators <span class="mono">D<sub>x</sub></span> and <span class="mono">D<sub>y</sub></span>. These filters highlight
+            horizontal and vertical changes, so rooftops and the tower edges stand out while flat regions fade.
+            I used <span class="mono">scipy.signal.convolve2d</span> to mirror the reference implementation from lecture.
+          </p>
+          <p>
+            Next I computed the gradient magnitude with <span class="mono">np.hypot</span> and binarised it to form an edge map.
+            Picking the threshold is a qualitative exercise; after a few tries I landed on <strong>0.12</strong>, which
+            suppresses sensor noise yet keeps all the real structure. The figures below summarise the results.
+          </p>
+          <div class="figure-block">
+            <h4>Figure 3: Cameraman partial derivatives</h4>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part1_2_cameraman_dx.png" alt="Cameraman derivative in x" />
+                <figcaption><span class="mono">D<sub>x</sub></span> response. Vertical edges glow while horizontals recede.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_2_cameraman_dy.png" alt="Cameraman derivative in y" />
+                <figcaption><span class="mono">D<sub>y</sub></span> response. Rooftops and horizon lines light up.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 4: Gradient magnitude and binarised edges</h4>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part1_2_cameraman_grad_mag.png" alt="Gradient magnitude for cameraman" />
+                <figcaption>Gradient magnitude combines both partials and reveals halos around the main structures.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_2_cameraman_edges.png" alt="Thresholded edge map for cameraman" />
+                <figcaption>Binary edge map at threshold 0.12. Noise drops while the tower remains crisp.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="part1-3">
+        <h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
+        <div class="card flow">
+          <p>
+            Applying the raw difference operator leaves plenty of high-frequency noise, so I first smooth
+            the cameraman image with a separable Gaussian kernel generated via <span class="mono">cv2.getGaussianKernel</span>
+            (size&nbsp;7, <span class="mono">σ = 1.4</span>). Re-running the derivative pipeline on this blurred image keeps the
+            important edges but mutes speckle. I threshold the gradient at <strong>0.10</strong>
+            (<span class="mono">PART13_EDGE_THRESHOLD</span>) and print a suggested baseline from the 90<sup>th</sup> percentile (≈0.11)
+            so the cutoff is easy to justify.
+          </p>
+          <p>
+            To avoid two sequential convolutions, I build derivative-of-Gaussian (DoG) filters by convolving
+            the Gaussian kernel with <span class="mono">D<sub>x</sub></span> and <span class="mono">D<sub>y</sub></span>. When these DoG kernels are applied directly to the
+            original image the results match the blurred-then-differentiate pipeline to numerical precision in the
+            interior. I crop the visualisation of each DoG kernel back to 7&times;7 so it lines up with the Gaussian,
+            and I keep signed colour maps for all derivative responses to highlight the positive/negative lobes.
+          </p>
+          <p>
+            The console now reports raw Part&nbsp;1.2 edge density (7.3%) alongside the smoothed and DoG edge ratios (both 10.9%).
+            It also prints the agreement score between each method and the unsmoothed edges (≈0.94 overall, ≈0.95 for the interior)
+            which makes the “What differences do you see?” comparison quantitative. Interior max |Δ| values are &lt;1e-15; the
+            slightly larger global deltas come solely from the zero-padded 4-pixel frame.
+          </p>
+          <div class="figure-block">
+            <h4>Figure 5: Filters used in the DoG pipeline</h4>
+            <div class="figure-grid tight">
+              <figure>
+                <img src="site_images/images_part1_3_gaussian_kernel.png" alt="Gaussian kernel heatmap" />
+                <figcaption>7×7 Gaussian kernel (σ = 1.4).</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_dog_filter_dx.png" alt="Derivative-of-Gaussian filter in x" />
+                <figcaption>DoG filter <span class="mono">G * D<sub>x</sub></span> visualised.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_dog_filter_dy.png" alt="Derivative-of-Gaussian filter in y" />
+                <figcaption>DoG filter <span class="mono">G * D<sub>y</sub></span>.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 6: Blurring before finite differences</h4>
+            <figure class="hero-figure">
+              <img src="site_images/images_part1_3_cameraman_gaussian_blur.png" alt="Gaussian blurred cameraman" />
+              <figcaption>Gaussian-blurred cameraman (less sensor noise, edges remain).</figcaption>
+            </figure>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_blur_dx.png" alt="Derivative after Gaussian blur in x" />
+                <figcaption>Derivative of the blurred image along x.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_blur_dy.png" alt="Derivative after Gaussian blur in y" />
+                <figcaption>Derivative of the blurred image along y.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_blur_grad_mag.png" alt="Gradient magnitude after Gaussian blur" />
+                <figcaption>Gradient magnitude post smoothing (fewer halo artifacts).</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_blur_edges.png" alt="Edge map after Gaussian blur" />
+                <figcaption>Thresholded edges (noticeably cleaner than Part&nbsp;1.2).</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 7: Direct DoG responses</h4>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_dog_dx.png" alt="Derivative-of-Gaussian response in x" />
+                <figcaption>Single-pass DoG response along x.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_dog_dy.png" alt="Derivative-of-Gaussian response in y" />
+                <figcaption>Single-pass DoG response along y.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_dog_grad_mag.png" alt="DoG gradient magnitude" />
+                <figcaption>DoG gradient magnitude (matches the blurred pipeline).</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part1_3_cameraman_dog_edges.png" alt="DoG edge map" />
+                <figcaption>DoG edge map (identical to the blurred version except at the padded frame).</figcaption>
+              </figure>
+            </div>
+          </div>
+          <p class="subtle">
+            Console summary: interior max |Δ| between the two pipelines is under <span class="mono">1e-15</span>; the
+            larger global deltas come solely from the zero-padded 4-pixel border.
+          </p>
+          <div class="code-block">
+            <span class="code-block-title">Part&nbsp;1.3 code</span>
+            <pre><code class="language-python">class Part13Runner:
+    def execute(self) -> Part13Results:
+        cameraman = load_grayscale(self.data_dir / "cameraman.png")
+        assert self.gaussian_ksize % 2 == 1, "Gaussian kernel size must be odd."
+
+        g1d = cv2.getGaussianKernel(self.gaussian_ksize, self.gaussian_sigma)
+        gaussian_kernel = (g1d @ g1d.T).astype(np.float64)
+
+        gaussian_blur = convolve2d(cameraman, gaussian_kernel, mode="same", boundary="fill")
+        blur_dx = convolve2d(gaussian_blur, DX_FILTER, mode="same", boundary="fill")
+        blur_dy = convolve2d(gaussian_blur, DY_FILTER, mode="same", boundary="fill")
+
+        dog_filter_x = convolve2d(DX_FILTER, gaussian_kernel, mode="full")
+        dog_filter_y = convolve2d(DY_FILTER, gaussian_kernel, mode="full")
+        dog_filter_x_vis = center_crop(dog_filter_x, gaussian_kernel.shape[0], gaussian_kernel.shape[1])
+        dog_filter_y_vis = center_crop(dog_filter_y, gaussian_kernel.shape[0], gaussian_kernel.shape[1])
+
+        dog_dx = convolve2d(cameraman, dog_filter_x, mode="same", boundary="fill")
+        dog_dy = convolve2d(cameraman, dog_filter_y, mode="same", boundary="fill")
+        dog_grad_mag = np.hypot(dog_dx, dog_dy)
+
+        save_image(blur_dx, self.asset_dir / "cameraman_blur_dx.png", signed=True)
+        save_image(dog_dx, self.asset_dir / "cameraman_dog_dx.png", signed=True)
+
+        raw_edges = (np.hypot(
+            convolve2d(cameraman, DX_FILTER, mode="same", boundary="fill"),
+            convolve2d(cameraman, DY_FILTER, mode="same", boundary="fill"),
+        ) >= PART12_EDGE_THRESHOLD).astype(np.float64)
+
+        # Console output reports Δ-metrics and agreement scores against Part 1.2 for interior vs whole image.
+        return Part13Results(...)</code></pre>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="part2">
+      <h2>Part 2: Fun with Frequencies!</h2>
+      <div class="card flow">
+        <p>
+          Part 2 shifts from spatial intuition to the frequency view. I start with unsharp masking as an
+          example of remixing low and high bands, move into hybrid images, then document Gaussian and
+          Laplacian stacks, and finish with multiresolution blending including the oraple remake.
+        </p>
+      </div>
+
+      <section id="part2-1">
+        <h3>Part 2.1: Image “Sharpening”</h3>
+        <div class="card flow">
+          <p>
+            Unsharp masking treats sharpening as a remix of low and high frequencies. I blur the image with a
+            Gaussian to isolate the base layer, subtract that from the original to recover the residual, then
+            add a scaled version of the residual back. Mathematically the same effect comes from convolving
+            the image with the unsharp mask kernel <span class="mono">(1 + κ)δ - κG</span>. Running both approaches produced
+            outputs that differed by only 1.6e-15, so the two step and single kernel views agree.
+          </p>
+          <p>
+            Everything here uses a 7×7 Gaussian with σ 1.4. The amount κ controls how much of the residual
+            returns. I looked at 0.5 for a gentle touch, 1.0 as the default, and 1.5 which pushes right up
+            against visible halos. Results are clipped to the 0 to 1 range, and I also save the signed high
+            frequency image for reference.
+          </p>
+          <p>
+            Convolutions reuse zero padding like the earlier parts, so a thin dark border can show up after
+            sharpening. Cropping a couple pixels from each side removes it when needed.
+          </p>
+          <div class="figure-block">
+            <h4>Figure 8: Taj Mahal sharpening pipeline</h4>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part2_1_taj_original.png" alt="Original Taj Mahal image" />
+                <figcaption>Original Taj Mahal photo.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_taj_blurred.png" alt="Taj Mahal blurred with Gaussian" />
+                <figcaption>Gaussian blur that keeps only the low frequencies.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_taj_high_frequency.png" alt="High-frequency residual for the Taj Mahal" />
+                <figcaption>Signed high frequency residual with zero mapped to mid grey.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_taj_sharpened_1.0.png" alt="Sharpened Taj Mahal image" />
+                <figcaption>Sharpened result with κ 1.0. Marble carvings pop without obvious ringing.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 9: Sharpening amount sweep on the Taj Mahal</h4>
+            <div class="figure-grid tight">
+              <figure>
+                <img src="site_images/images_part2_1_taj_sharpened_0.5.png" alt="Taj Mahal sharpened with amount 0.5" />
+                <figcaption>κ 0.5 keeps the change subtle.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_taj_sharpened_1.0.png" alt="Taj Mahal sharpened with amount 1.0" />
+                <figcaption>κ 1.0 balances detail and artifacts.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_taj_sharpened_1.5.png" alt="Taj Mahal sharpened with amount 1.5" />
+                <figcaption>κ 1.5 introduces halos around the domes.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 10: Bird sharpening comparison</h4>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part2_1_bird_original.png" alt="Original bird image" />
+                <figcaption>Original bird photo with soft focus.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_bird_blurred.png" alt="Blurred bird image" />
+                <figcaption>Gaussian blur used as the low pass reference.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_bird_high_frequency.png" alt="High-frequency residual for the bird" />
+                <figcaption>High frequency residual showing feather edges.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_bird_sharpened_1.2.png" alt="Sharpened bird image" />
+                <figcaption>Sharpened bird with κ 1.2 for a slightly stronger boost.</figcaption>
+              </figure>
+            </div>
+            <div class="figure-grid tight">
+              <figure>
+                <img src="site_images/images_part2_1_bird_sharpened_0.5.png" alt="Bird sharpened with amount 0.5" />
+                <figcaption>κ 0.5 provides a gentle lift.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_bird_sharpened_1.0.png" alt="Bird sharpened with amount 1.0" />
+                <figcaption>κ 1.0 recovers feather contrast without halos.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_bird_sharpened_1.5.png" alt="Bird sharpened with amount 1.5" />
+                <figcaption>κ 1.5 starts to amplify background noise.</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="figure-block">
+            <h4>Figure 11: Strawberry blur and attempted recovery</h4>
+            <p>
+              To probe the limits of unsharp masking I blurred a sharp strawberry image with an 11×11
+              Gaussian (σ 2.0) and tried to recover it with κ 1.0 using the same kernel. The sharpened
+              version looks crisper than the blurred input yet still lacks the sparkling seeds and highlights
+              of the original. Once those details drop into the low frequency band they cannot be fully
+              restored. The result lands at 25.8 dB PSNR, around 2.6e-3 MSE, when measured against the clean
+              reference.
+            </p>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part2_1_strawberry_original.png" alt="Original strawberry image" />
+                <figcaption>Original strawberry.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_strawberry_blurred.png" alt="Blurred strawberry image" />
+                <figcaption>Artificial blur simulating a defocused shot.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_1_strawberry_sharpened_1.0.png" alt="Sharpened strawberry image" />
+                <figcaption>Sharpened attempt with κ 1.0. Contrast improves but the small details stay soft.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="part2-2">
+        <h3>Part 2.2: Hybrid Images</h3>
+        <div class="card flow">
+          <p>
+            I implemented a hybrid image pipeline. It first resizes both images to similar heights,
+            estimates a sub pixel shift with phase correlation, and crops them to the overlapping region. The
+            code tries both shift directions and keeps the one with the higher normalised cross correlation.
+            After alignment it applies complementary Gaussian filters to isolate the low and high bands and
+            adds them back together with a tunable weight. All processing happens in grayscale to keep the
+            focus on luminance, and the high frequency residual gets its mean removed before blending. Every
+            run saves aligned inputs, filtered views, Fourier spectra, and the final hybrid for later review.
+          </p>
+
+          <div class="figure-block">
+            <h4>Figure 12: Fire and rabbit hybrid (favorite)</h4>
+            <p>
+              Flames provide the low frequencies with σ 4.0 while the rabbit contributes the high
+              frequencies with σ 8.0 and a high frequency weight of 0.5. Only a small vertical shift was
+              needed before cropping. Up close you see whiskers. From across the room the fire silhouette
+              dominates.
+            </p>
+            <div class="figure-grid tight">
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_fire_aligned.png" alt="Aligned fire input" />
+                <figcaption>Aligned fire frame ready for low pass filtering.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_rabbit_aligned.png" alt="Aligned rabbit input" />
+                <figcaption>Aligned rabbit frame handled as the high frequency source.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_fire_lowpass_sigma4.00.png" alt="Low-pass fire" />
+                <figcaption>Fire after a Gaussian blur with σ 4.0.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_rabbit_highpass_sigma8.00.png" alt="High-pass rabbit" />
+                <figcaption>Rabbit residual after subtracting a σ 8.0 blur.</figcaption>
+              </figure>
+            </div>
+            <figure class="hero-figure">
+              <img src="site_images/images_part2_2_bunny_fire_bunny_fire_hybrid.png" alt="Hybrid bunny and fire" />
+              <figcaption>Hybrid result. Rabbit detail stays at short viewing distances while flames take over at long range.</figcaption>
+            </figure>
+            <div class="figure-grid tight">
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_fire_fft_low_original.png" alt="Fire FFT" />
+                <figcaption>Log magnitude of the original fire image.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_fire_fft_low_lowpass.png" alt="Fire low-pass FFT" />
+                <figcaption>After low pass filtering the spectrum collapses near the origin.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_rabbit_fft_high_original.png" alt="Rabbit FFT" />
+                <figcaption>Rabbit spectrum contains energy across the full plane.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_rabbit_fft_high_highpass.png" alt="Rabbit high-pass FFT" />
+                <figcaption>High pass residual emphasises the outer bands.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_bunny_fire_bunny_fire_fft_hybrid.png" alt="Hybrid FFT" />
+                <figcaption>Final hybrid spectrum blends the low centre with the rabbit's high frequency shell.</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div class="figure-block">
+            <h4>Figure 13: Derek and Nutmeg hybrid</h4>
+            <p>
+              Nutmeg rotates thirty degrees counter clockwise and shifts right before alignment. Derek keeps
+              σ 9.5 as the low band while Nutmeg runs with σ 2.4 and a weight of 2.1 so the fur reads up
+              close without overwhelming Derek's face.
+            </p>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part2_2_derek_nutmeg_derek_aligned.png" alt="Aligned Derek" />
+                <figcaption>Derek after alignment, serving as the low frequency anchor.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_derek_nutmeg_nutmeg_aligned.png" alt="Aligned Nutmeg" />
+                <figcaption>Nutmeg aligned and ready for high frequency extraction.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_derek_nutmeg_derek_nutmeg_hybrid.png" alt="Derek Nutmeg hybrid" />
+                <figcaption>Hybrid: Derek is clear at close range, Nutmeg appears from afar.</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div class="figure-block">
+            <h4>Figure 14: Cave and bear hybrid</h4>
+            <p>
+              The cave supplies the low frequencies with σ 7.0 while the bear uses σ 6.5 and a weight of
+              0.35 for the high band. The composition leaves a glowing tunnel silhouette when viewed from
+              across the room, with the bear emerging when you stand close.
+            </p>
+            <div class="figure-grid">
+              <figure>
+                <img src="site_images/images_part2_2_cave_bear_cave_aligned.png" alt="Aligned cave" />
+                <figcaption>Cave frame acting as the low pass channel.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_cave_bear_bear_aligned.png" alt="Aligned bear" />
+                <figcaption>Bear frame aligned for high frequency detail.</figcaption>
+              </figure>
+              <figure>
+                <img src="site_images/images_part2_2_cave_bear_cave_bear_hybrid.png" alt="Cave bear hybrid" />
+                <figcaption>Hybrid scene. The bear hides in the cave's darkness until you get close.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="part2-3">
+        <h3>Part 2.3: Gaussian and Laplacian Stacks</h3>
+        <div class="card flow">
+          <p>
+            I built reusable stack helpers that blur without downsampling. Each Gaussian level re-applies a
+            <span class="mono">σ = 2.0</span> kernel to the previous image (five levels total), and the Laplacian stack stores
+            band-pass detail as <span class="mono">L<sub>i</sub> = G<sub>i</sub> − G<sub>i+1</sub></span> with the final low-pass residual untouched. Summing all
+            Laplacian levels reconstructs the input to numerical precision (max |δ| ≈ <span class="mono">1.1e-16</span> for both
+            apple and orange), confirming the stack implementation is correct and stable.
+          </p>
+          <p>
+          Using these stacks I recreated the “oraple” example. A half-and-half step mask is blurred
+          with the same Gaussian stack so fine bands mix gently while coarse structure transitions smoothly,
+          leaving behind a convincing seamless fruit hybrid.
+          </p>
+          <p>
+          I first blended the original apple/orange pair from the Burt &amp; Adelson paper (recently scanned and
+          stored as <span class="mono">apple.jpeg</span> and <span class="mono">orange.jpeg</span>). The same pipeline then re-runs on the provided
+          project photos (<span class="mono">apple.jpg</span>, <span class="mono">orange.jpg</span>) for comparison.
+          </p>
+          <div class="figure-grid">
+          <figure>
+            <img src="site_images/images_part2_3_paper_pair_apple_original.png" alt="Paper apple input" />
+            <figcaption>Paper apple scan (left of the step mask).</figcaption>
+          </figure>
+          <figure>
+            <img src="site_images/images_part2_3_paper_pair_orange_original.png" alt="Paper orange input" />
+            <figcaption>Paper orange scan (right of the step mask).</figcaption>
+          </figure>
+          <figure>
+            <img src="site_images/images_part2_3_paper_pair_oraple_blend.png" alt="Paper oraple blend" />
+            <figcaption>Recreation of the paper’s oraple using the scanned pair.</figcaption>
+          </figure>
+          </div>
+          <div class="figure-grid">
+            <figure>
+              <img src="site_images/images_part2_3_apple_original.png" alt="Original apple used for low/right blend" />
+              <figcaption>Aligned apple input (left side of the step mask).</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_3_orange_original.png" alt="Original orange used for blend" />
+              <figcaption>Aligned orange input (right side of the step mask).</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_3_oraple_blend.png" alt="Final oraple blend" />
+              <figcaption>Final oraple blend after summing the masked Laplacian stack.</figcaption>
+            </figure>
+          </div>
+          <h4>Figure 3.42: Laplacian stack anatomy</h4>
+          <figure class="hero-figure">
+            <img src="site_images/images_part2_3_figure342_grid.png" alt="Laplacian stack details mirroring Figure 3.42 from Burt &amp; Adelson" />
+            <figcaption>
+              Top to bottom: high-, mid-, and low-frequency Laplacian bands (levels 0, 2, 4), followed by the
+              reconstructed RGB images. Left column (a, d, g, j) is the apple weighted by the blurred mask;
+              middle column (b, e, h, k) is the orange; right column (c, f, i, l) shows the averaged
+              contribution at each level.
+            </figcaption>
+          </figure>
+          <ul>
+            <li><strong>Row 1 (a–c)</strong>: finest detail: stem edges and skin pores.</li>
+            <li><strong>Row 2 (d–f)</strong>: mid-band silhouette and highlight transitions.</li>
+            <li><strong>Row 3 (g–i)</strong>: coarse colour gradients governed by the smoothed mask.</li>
+            <li><strong>Row 4 (j–l)</strong>: full reconstruction of apple, orange, and the final oraple.</li>
+          </ul>
+          <p>
+            The per-level PNGs under <span class="mono">images/part2_3/level_0*</span> map directly to the annotated grid,
+            so the figure is more than a collage. It is your index into the stack assets for grading.
+          </p>
+          <p class="subtle">
+          Assets: <span class="mono">images/part2_3</span> contains all per-level Laplacians, masked contributions, and the smoothed
+          mask used for blending. The scanned pair lives under <span class="mono">paper_pair/</span>. The same utilities will power the multiresolution blending
+            experiments in Part&nbsp;2.4.
+          </p>
+        </div>
+      </section>
+
+      <section id="part2-4">
+        <h3>Part 2.4: Multiresolution Blending (a.k.a. the oraple!)</h3>
+        <div class="card flow">
+          <p>
+            Building on the Gaussian and Laplacian stacks from Part&nbsp;2.3, I implemented the Burt &amp;
+            Adelson mask-based multiresolution blending algorithm. Each pair uses six stack levels with
+            <span class="mono">σ = 2.6</span> for the images while the mask stack receives extra blur so coarse bands share a
+            broad, feathered transition. After feedback about seam artifacts and excess bleed around the
+            sun, I retuned the mask smoothing on every example: more blur for the straight seams, tighter
+            radii and a steeper falloff for the sun mask, yielding smoother composites without stray halos.
+            The vertical-step oraple blend remains documented in Part&nbsp;2.3; below are the additional
+            Part&nbsp;2.4 results focusing on a horizontal seam and an irregular mask.
+          </p>
+
+          <h4>Forest + Sea: horizontal seam</h4>
+          <p>
+            For the landscape blend I swapped the order so the forest serves as image&nbsp;A. A horizontal step
+            mask keeps the canopy on top (mask&nbsp;=&nbsp;1) and transitions into the sea below. Coarse mask levels
+            widen the feathered band to over 100&nbsp;px, preventing a visible horizon misalignment.
+          </p>
+          <div class="figure-grid tight">
+            <figure>
+              <img src="site_images/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_a_aligned.png" alt="Aligned forest image" />
+              <figcaption>Forest (upper region of the blend).</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_b_aligned.png" alt="Aligned sea image" />
+              <figcaption>Sea (lower region of the blend).</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_forest_sea_horizontal_mask_smoothed.png" alt="Smoothed horizontal seam mask" />
+              <figcaption>Smoothed horizontal mask, wide blur at coarse scales keeps the horizon gentle.</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_forest_sea_horizontal_forest_sea_horizontal_blend.png" alt="Forest and sea multiresolution blend" />
+              <figcaption>Result: the treeline fades into ocean mist without double exposure.</figcaption>
+            </figure>
+          </div>
+
+          <h4>Sun + Cone:irregular mask (favorite)</h4>
+          <p>
+            To replace the ice-cream scoop with the sun, I draw a compact elliptical mask and apply a steep
+            logistic falloff so the weighting drops rapidly outside the solar disk. A gentle Gaussian
+            highlight keeps the lens flare while preserving a clean edge. The mask stack now uses a weaker
+            blur (<span class="mono">σ<sub>mask</sub> ≈ 5.7</span>) than my initial attempt, dramatically reducing sky bleed while the
+            Laplacian levels continue to taper the boundary smoothly. The masked inputs show how the mask
+            isolates each contributor prior to the stack combination, and three Laplacian levels illustrate
+            the multiresolution mixing process analogous to Figure&nbsp;10 of the paper.
+          </p>
+          <div class="figure-grid tight">
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_sun_cone_irregular_a_aligned.png" alt="Aligned sun photograph" />
+              <figcaption>Aligned sun (image&nbsp;A): becomes the new scoop.</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_sun_cone_irregular_b_aligned.png" alt="Aligned ice-cream cone photograph" />
+              <figcaption>Aligned cone (image&nbsp;B): supplies cone and background.</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_mask_smoothed.png" alt="Irregular mask for sun on cone" />
+              <figcaption>Gaussian-smoothed irregular mask used at every level.</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_sun_cone_irregular_blend.png" alt="Sun on cone multiresolution blend" />
+              <figcaption>Final blend: the sun softly nests into the cone with no hard edge.</figcaption>
+            </figure>
+          </div>
+          <div class="figure-grid tight">
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_masked_a.png" alt="Masked sun input" />
+              <figcaption>Masked sun input (image&nbsp;A multiplied by the mask).</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_masked_b.png" alt="Masked cone input" />
+              <figcaption>Masked cone input (image&nbsp;B multiplied by 1−mask).</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_level_00_mixed_00.png" alt="Fine-level mixed Laplacian" />
+              <figcaption>Level&nbsp;0 (fine details): crisp highlight boundary stays sharp.</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_level_03_mixed_03.png" alt="Mid-level mixed Laplacian" />
+              <figcaption>Level&nbsp;3 (mid frequencies): the glow blends smoothly into the cone.</figcaption>
+            </figure>
+            <figure>
+              <img src="site_images/images_part2_4_sun_cone_irregular_level_05_mixed_05.png" alt="Coarse-level mixed Laplacian" />
+              <figcaption>Level&nbsp;5 (coarsest residual): the broad illumination gently shifts between images.</figcaption>
+            </figure>
+          </div>
+
+          <p class="subtle">
+            Additional assets: including every Laplacian level, masked contributions, and per-level masks are
+            available in <span class="mono">images/part2_4/</span>. Reconstruction checks stay within numerical precision
+            (≤&nbsp;2.3e−16) for all inputs, and intensity ranges are clipped to [0,1] after blending.
+          </p>
+        </div>
+      </section>
+    </section>
+
+  </div>
+</body>
+</html>
 
