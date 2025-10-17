@@ -1,1 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>[Auto]Stitching Photo Mosaics</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f8fafc;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #0ea5e9;
+      --accent-2: #0284c7;
+      --border: #e2e8f0;
+    }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+    header h1 { font-weight: 800; letter-spacing: 0.2px; line-height: 1.15; margin: 0 0 4px; font-size: clamp(26px, 3.5vw, 40px); }
+    section { margin-top: 36px; }
+    h2 { font-size: 22px; margin: 0 0 12px; }
+    h3 { font-size: 18px; margin: 0; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+  /* Tighten vertical rhythm inside flow containers by removing default margins */
+  .flow > * { margin: 0; }
+  .flow > * + * { margin-top: 10px; }
+    .subtle { color: var(--muted); font-size: 13px; }
+    .set-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+    .set-grid figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+    .set-grid img { width: 100%; border-radius: 0; border: 1px solid var(--border); background: #fff; }
+  .set-grid figcaption { font-size: 12px; color: var(--muted); }
+  .set-grid.two-up { align-items: start; }
+  .set-grid.two-up + .image-wide { margin-top: 18px; }
+  .set-grid.rect-after { margin-top: 14px; }
+    .code-block { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 12px; background: #0f172a; color: #e2e8f0; padding: 12px 14px; border-radius: 10px; overflow-x: auto; }
+    .code-block.light { background: #e2e8f0; color: #0f172a; }
+    .dataset-block { margin-top: 24px; padding-top: 6px; border-top: 1px solid var(--border); }
+    .dataset-block:first-of-type { border-top: none; padding-top: 0; }
+    .dataset-block h3 { font-size: 18px; margin-bottom: 8px; }
+  .image-wide { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .image-wide img { width: min(100%, 920px); border: 1px solid var(--border); background: #fff; margin: 0 auto; display: block; }
+  .image-wide.rect-before img { width: min(100%, 460px); }
+  .set-grid.rect-after img { width: min(100%, 460px); margin: 0 auto; }
+  .image-wide figcaption { font-size: 13px; color: var(--muted); text-align: center; }
+  ul { margin: 0 0 6px 20px; color: var(--muted); }
+  .descriptor-visual { margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .descriptor-visual img { width: min(100%, 540px); border: 1px solid var(--border); background: #fff; }
+  .descriptor-visual.descriptor-montage img { width: min(100%, 380px); image-rendering: pixelated; }
+  .descriptor-visual + .descriptor-visual { margin-top: 24px; }
+    @media (max-width: 640px) { .wrap { padding: 28px 16px 64px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>[Auto]Stitching Photo Mosaics</h1>
+    </header>
+
+    <!-- Introduction -->
+    <section id="intro">
+      <h2>Introduction</h2>
+      <div class="card flow">
+        <p>This project focuses on creating photo mosaics using image processing techniques. We will implement various algorithms for feature detection, matching, and image blending to create mosaics from multiple images, first manual and then automatic.</p>
+      </div>
+    </section>
+
+    <!-- A.1 -->
+    <section id="a1-shoot">
+      <h2>A.1 · Shoot the Pictures</h2>
+      <div class="card flow">
+        <p>I captured three pairs of photographs with a fixed center of projection by rotating the camera horizontally while keeping the center of projection static. Each pair exhibits noticeable projective distortion that we will later align via a homography.</p>
+
+        <div class="flow">
+          <div>
+            <p>The first image set is of window frames that have strong horizontal and vertical lines which should help constrain the homography:</p>
+            <div class="set-grid">
+              <figure>
+                <img src="assets/window1.jpg" alt="Window alcove left view" loading="lazy" />
+                <figcaption>Window · View A</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/window2.jpg" alt="Window alcove right view" loading="lazy" />
+                <figcaption>Window · View B</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div>
+            <p>The second image set was taken on a deck showing trees and buildings:</p>
+            <div class="set-grid">
+              <figure>
+                <img src="assets/trees1.jpg" alt="Redwood grove left view" loading="lazy" />
+                <figcaption>Trees · View A</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/trees2.jpg" alt="Redwood grove right view" loading="lazy" />
+                <figcaption>Trees · View B</figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div>
+            <p>The third image set is of an indoor wall mural of Keith Haring art:</p>
+            <div class="set-grid">
+              <figure>
+                <img src="assets/mural1.jpg" alt="Mural left view" loading="lazy" />
+                <figcaption>Mural · View A</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/mural2.jpg" alt="Mural right view" loading="lazy" />
+                <figcaption>Mural · View B</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- A.2 -->
+    <section id="a2-homographies">
+      <h2>A.2 · Recover Homographies</h2>
+      <div class="card flow">
+        <p>I implemented <code>computeH</code> in <code>code/main.py</code> using the direct linear transform. Each correspondence contributes two rows to the linear system <em>Ah = b</em> (shown below), where the eight unknowns are the first two rows of the homography plus the first two entries of the third row. The final entry <code>h33</code> is fixed at 1.0 to remove the global scale ambiguity. I keep the coordinate convention from the correspondence tool, treating a point as <code>(x, y) = (column, row)</code> in image space.</p>
+        <p>With more than four correspondences per pair, the system becomes overdetermined. I solve it via <code>numpy.linalg.lstsq</code>, reshape the result back into a 3×3 matrix, and renormalize so that <code>H[2,2] = 1</code>. After solving I verify consistency by projecting the source points forward and reporting the residuals.</p>
+
+        <h3>Linear System Structure</h3>
+  <div class="flow">
+    <pre class="code-block light">[x  y  1  0  0  0  -u*x  -u*y]   [h11]   [u]
+[0  0  0  x  y  1  -v*x  -v*y] · [h12] = [v]
+           ...</pre>
+    <p>The first row enforces that the x-coordinate from image 1 maps to the observed x' in image 2 when scaled by the third row of H. The second row for the same correspondence enforces the y-coordinate mapping. Stacking all rows yields an overdetermined system that least squares can solve reliably.</p>
+    <pre class="code-block light">Example (window set, first correspondence):
+[2378.06 1097.05    1.      0.      0.      0.  -2983059.34 -1376149.06]
+[   0.      0.      0.   2378.06 1097.05    1.  -2458595.16 -1134202.52]ᵀ</pre>
+  </div>
+
+        <div class="dataset-block">
+          <h3>Window</h3>
+          <figure class="image-wide">
+            <img src="assets/window_matches.png" alt="Window correspondences" loading="lazy" />
+            <figcaption>26 correspondences</figcaption>
+          </figure>
+          <pre class="code-block">H_window ~
+[[ 1.0462e+01 -3.6050e-01 -1.6359e+04]
+ [ 2.7010e+00  6.7346e+00 -7.1132e+03]
+ [ 2.4000e-03 -2.0000e-04  1.0000e+00]]
+RMSE = 24.12 px -- max error = 65.54 px</pre>
+          <p>The higher residual comes from the repetitive structure, i.e. several correspondences are on almost parallel lines, so small noise creates large reprojection drift. I plan to smooth these inconsistencies during blending.</p>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Trees</h3>
+          <figure class="image-wide">
+            <img src="assets/trees_matches.png" alt="Trees correspondences" loading="lazy" />
+            <figcaption>30 correspondences</figcaption>
+          </figure>
+          <pre class="code-block">H_trees ~
+[[ 2.5257e+00 -1.7600e-02 -4.8181e+03]
+ [ 4.4800e-01  2.0730e+00 -1.3329e+03]
+ [ 4.0000e-04 -0.0000e+00  1.0000e+00]]
+RMSE = 6.62 px -- max error = 14.42 px</pre>
+          <p>The railing gives good horizontal constraints, while tree trunks and building edges anchor vertical structure. The reprojection errors are within a few pixels, which is good for seamless mosaics.</p>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Mural</h3>
+          <figure class="image-wide">
+            <img src="assets/mural_matches.png" alt="Mural correspondences" loading="lazy" />
+            <figcaption>32 correspondences</figcaption>
+          </figure>
+          <pre class="code-block">H_mural ~
+[[ 7.5390e+00  6.1020e-01 -1.1433e+04]
+ [ 1.3934e+00  5.2645e+00 -3.9517e+03]
+ [ 1.6000e-03  1.0000e-04  1.0000e+00]]
+RMSE = 4.57 px -- max error = 8.65 px</pre>
+          <p>The mural set gives the tightest fit. High-contrast edges and good perspective cues let least squares converge to a low-error solution that will function as a good rectification reference.</p>
+        </div>
+
+        <p>Across all three datasets, the homographies satisfy the projective model and will be reused unchanged for warping, rectification, and mosaicing in the following sections.</p>
+      </div>
+    </section>
+
+    <!-- A.3 -->
+    <section id="a3-warping">
+      <h2>A.3 · Warp the Images</h2>
+      <div class="card flow">
+        <p>I implemented both <code>warpImageNearestNeighbor</code> and <code>warpImageBilinear</code> by following the inverse-warping recipe so that every pixel in the output looks up its source in the original image in order to avoid holes. For each call I:</p>
+        <ul>
+          <li>Project the four source corners through <code>H</code> to predict the output bounding box.</li>
+          <li>Create a dense grid over that box, transform every location back with <code>H<sup>-1</sup></code>, and analyze the interpolant.</li>
+          <li>Warp an all-ones mask to track which output pixels received valid samples and crop to the tightest rectangle containing data.</li>
+        </ul>
+        <p>The nearest-neighbor variant rounds the floating-point coordinates and is therefore fast but prone to aliasing. The bilinear version uses the four-neighbor weighted blend, which eliminates stair-stepping at the cost of more computations.</p>
+
+        <div class="dataset-block">
+          <h3>Wall Tarp Rectification</h3>
+          <figure class="image-wide rect-before">
+            <img src="assets/wall.jpg" alt="Wall source image" loading="lazy" />
+          </figure>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="assets/wall_rect_nn.png" alt="Wall rectified with nearest neighbor" loading="lazy" />
+              <figcaption>Nearest neighbor: text strokes are jagged from hard rounding.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/wall_rect_bilinear.png" alt="Wall rectified with bilinear" loading="lazy" />
+              <figcaption>Bilinear: lines are crisp and lettering regains straight edges.</figcaption>
+            </figure>
+          </div>
+          <p>Rectifying the wall artwork turns the projective skew into an axis-aligned poster. Bilinear interpolation carries over high-frequency strokes cleanly, while nearest neighbor leaves stair-step artifacts on diagonals and text.</p>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Boat Photograph Rectification</h3>
+          <figure class="image-wide rect-before">
+            <img src="assets/boats.jpg" alt="Boat source image" loading="lazy" />
+          </figure>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="assets/boats_rect_nn.png" alt="Boat rectified with nearest neighbor" loading="lazy" />
+              <figcaption>Nearest neighbor: ripples and rails show aliasing and staircases.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/boats_rect_bilinear.png" alt="Boat rectified with bilinear" loading="lazy" />
+              <figcaption>Bilinear: smooth gradients and straight rails with minimal artifacts.</figcaption>
+            </figure>
+          </div>
+          <p>The bilinear resample keeps light reflections coherent and retains thin structural edges without the jaggedness visible in the nearest-neighbor output.</p>
+        </div>
+
+        <p>In both examples the mask driven crop removes empty borders, leaving the valid warped content. Overall, nearest neighbor is useful as a debugging baseline, but the bilinear variant is better for mosaicing due to its better visual fidelity.</p>
+      </div>
+    </section>
+
+    <!-- A.4 -->
+    <section id="a4-mosaics">
+      <h2>A.4 · Blend the Images into a Mosaic</h2>
+      <div class="card flow">
+        <p>I keep the left image in each pair as the reference canvas and warp the right image into that frame using the precomputed homography <code>H<sub>BA</sub></code>. The blending routine follows this sequence:</p>
+        <ul>
+          <li><strong>Robust canvas planning:</strong> I project a dense grid of source pixels through the homography and discard outliers with a MAD filter. The surviving footprint defines a tight bounding box so I never allocate the enormous canvases that the raw corner projection can suggest.</li>
+          <li><strong>Inverse-warp with bilinear sampling:</strong> Every pixel in the warped image is filled by walking backward with <code>H<sup>-1</sup></code> and bilinear interpolation. A companion warp of an all-ones mask records which canvas pixels received valid samples.</li>
+          <li><strong>Distance-transform alphas:</strong> I assign the reference image an alpha mask derived from a distance transform with full weight in the interior, tapering to zero at the border. The warped image receives the same processing on its footprint. These soft masks mean a smooth, feathered transition in overlap regions.</li>
+          <li><strong>Gain compensation &amp; cropping:</strong> Overlapping pixels mean a per-channel least-squares gain so exposure mismatches fade. I crop to the tightest bounding box where the accumulated alpha exceeds a small threshold.</li>
+        </ul>
+        <p>The output is a single blended mosaic per pair with clean seams and no hard cut lines. Below, each row shows the two inputs (left-to-right) followed by the resulting mosaic.</p>
+
+        <div class="dataset-block">
+          <h3>Window</h3>
+          <div class="set-grid two-up">
+            <figure>
+              <img src="assets/window1.jpg" alt="Window view A" loading="lazy" />
+              <figcaption>Window &middot; View A</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/window2.jpg" alt="Window view B" loading="lazy" />
+              <figcaption>Window &middot; View B</figcaption>
+            </figure>
+          </div>
+          <figure class="image-wide">
+            <img src="assets/window_points_mosaic.png" alt="Window mosaic" loading="lazy" />
+            <figcaption>Feathered mosaic &mdash; sash columns align without visible seams.</figcaption>
+          </figure>
+          <p>The robust bounding step keeps the warped frame manageable even though the homography extrapolates far outside the window panes. Weighted averaging hides the brightness difference between the two captures.</p>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Trees</h3>
+          <div class="set-grid two-up">
+            <figure>
+              <img src="assets/trees1.jpg" alt="Trees view A" loading="lazy" />
+              <figcaption>Trees &middot; View A</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trees2.jpg" alt="Trees view B" loading="lazy" />
+              <figcaption>Trees &middot; View B</figcaption>
+            </figure>
+          </div>
+          <figure class="image-wide">
+            <img src="assets/trees_points_mosaic.png" alt="Trees mosaic" loading="lazy" />
+            <figcaption>Feathered mosaic &mdash; the deck railing stitches into a straight line.</figcaption>
+          </figure>
+          <p>The shared horizontal railing is a strong anchor while the feather mask smoothly blends sky gradients and foliage without ghosting.</p>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Museum</h3>
+          <div class="set-grid two-up">
+            <figure>
+              <img src="assets/mural1.jpg" alt="Mural view A" loading="lazy" />
+              <figcaption>Mural &middot; View A</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/mural2.jpg" alt="Mural view B" loading="lazy" />
+              <figcaption>Mural &middot; View B</figcaption>
+            </figure>
+          </div>
+          <figure class="image-wide">
+            <img src="assets/mural_points_mosaic.png" alt="Mural mosaic" loading="lazy" />
+            <figcaption>Feathered mosaic &mdash; floor tiles and ceiling trim align cleanly.</figcaption>
+          </figure>
+          <p>This scene contains vivid colors and repetitive patterns. The distance-transform weights keep the seam inside the artwork nearly invisible.</p>
+        </div>
+
+        <p>All mosaics reuse the same manual correspondences from A.2 and rely on the warping/blending stack which generalizes to additional image sets and lays the groundwork for Part&nbsp;B’s automatic pipeline.</p>
+      </div>
+    </section>
+
+    <!-- B.1 -->
+    <section id="b1-harris">
+      <h2>B.1 · Harris Corner Detection</h2>
+      <div class="card flow">
+        <p>I start by loading each RGB frame with my existing helper, convert it to a float32 grayscale image in [0, 1], and then run the supplied <code>harris.get_harris_corners</code> implementation. If the dependency is missing I fall back to an OpenCV pipeline (Harris response → Gaussian blur → 3×3 dilation for local maxima), applying a 20&nbsp;pixel border mask in both cases. The routine keeps the response value for every peak so that later stages can reason about corner strength.</p>
+        <p>To cull redundant detections I implement Adaptive Non-Maximal Suppression with the same robustness heuristic used in the MOPS paper. Points are first sorted by Harris score; each radius is the distance to the nearest corner whose response is at least 10% stronger (<code>c<sub>robust</sub>=0.9</code>). I retain the top <code>K=500</code> radii (ties broken by score) and render two visualizations:</p>
+
+        <div class="dataset-block">
+          <h3>Trees</h3>
+          <div class="set-grid two-up">
+            <figure>
+              <img src="assets/trees1_harris_all.png" alt="Trees Harris corners" loading="lazy" />
+              <figcaption>Over 22k raw Harris detections.</figcaption>
+            </figure>
+            <figure>
+              <img src="assets/trees1_harris_anms_K500.png" alt="Trees ANMS corners" loading="lazy" />
+              <figcaption>ANMS smooths the distribution and keeps strong responses on the trunks and skyline.</figcaption>
+            </figure>
+          </div>
+          <p>Even in highly textured regions the adaptive radius thresholds prevent clusters of overlapping keypoints, which significantly reduces descriptor redundancy and RANSAC iteration counts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- B.2 -->
+    <section id="b2-descriptors">
+      <h2>B.2 · Feature Descriptor Extraction</h2>
+      <div class="card flow">
+        <p>I follow the MOPS recipe as closely as possible while remaining axis-aligned. For every ANMS survivor I reflect-pad the grayscale image by 20&nbsp;pixels so that a full 40×40 window is always available, then use <code>cv2.getRectSubPix</code> to sample that patch at sub-pixel precision. The patch is downsampled to an 8×8 descriptor with <code>INTER_AREA</code> filtering, flattened to 64 entries, mean-centered, and gain-normalized (divide by standard deviation plus 1e-6). Completely flat regions fall back to an all-zero descriptor so later stages never encounter NaNs.</p>
+        <ul>
+          <li>Inputs: float32 grayscale in [0, 1] and ANMS coordinates (x, y).</li>
+          <li>Safety margin: 20&nbsp;px reflect padding guarantees valid support.</li>
+          <li>Sampling: inverse-map 40×40 window via <code>getRectSubPix</code>, then blur-downsample to 8×8.</li>
+          <li>Normalization: subtract mean, divide by stddev; zero out near-constant patches.</li>
+        </ul>
+        <p>Running this gave 100 valid descriptors from the 100 ANMS points in <code>mural1</code>. Below I show 25 randomly sampled descriptors with a fixed seed for reproducibility.</p>
+        <div class="flow">
+          <figure class="descriptor-visual descriptor-overlay">
+            <img src="assets/mural1_descriptor_samples_overlay.png" alt="Descriptor sample overlay" loading="lazy" />
+            <figcaption>Overlay of the 25 sampled descriptor centers on the mural image.</figcaption>
+          </figure>
+          <figure class="descriptor-visual descriptor-montage">
+            <img src="assets/mural1_descriptor_montage.png" alt="Descriptor montage" loading="lazy" />
+            <figcaption>Each 8×8 descriptor after mean/std normalization, upscaled for visibility.</figcaption>
+          </figure>
+        </div>
+        <p>The montage shows that descriptors capture blurred structure around corners (e.g., bold outlines and floor tiles) while suppressing low-frequency bias. Many patches are illumination invariant due to the gain normalization.</p>
+      </div>
+    </section>
+
+    <!-- B.3 -->
+    <section id="b3-matching">
+      <h2>B.3 · Feature Matching</h2>
+      <div class="card flow">
+        <p>I implement descriptor matching by forming the full pairwise squared-distance matrix between the normalized 8×8 patches from both images. The computation uses the identity ‖a−b‖<sup>2</sup> = ‖a‖<sup>2</sup> + ‖b‖<sup>2</sup> − 2a·b. For every feature in image A I then identify the nearest and second-nearest neighbors in image B via <code>argpartition</code>, convert the squared distances to Euclidean distances, and form Lowe’s ratio <code>r = d<sub>1</sub> / d<sub>2</sub></code>.</p>
+        <ul>
+          <li>Reject candidates whenever image B offers fewer than two descriptors or when the second-best distance underflows.</li>
+          <li>Keep matches satisfying <code>r &lt; τ</code> with <code>τ = 0.70</code></li>
+          <li>Apply a mutual check: B’s own nearest neighbor back into A must equal the proposing feature, eliminating most collisions.</li>
+        </ul>
+        <p>Each caption below reports the match count and the median Lowe ratio for the accepted correspondences.</p>
+
+        <div class="dataset-block">
+          <h3>Window</h3>
+          <figure class="image-wide">
+            <img src="assets/window1_vs_window2_matches_tau0p70.png" alt="Window feature matches" loading="lazy" />
+            <figcaption>46 matches (median r = 0.52)</figcaption>
+          </figure>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Trees</h3>
+          <figure class="image-wide">
+            <img src="assets/trees1_vs_trees2_matches_tau0p70.png" alt="Trees feature matches" loading="lazy" />
+            <figcaption>39 matches (median r = 0.55)</figcaption>
+          </figure>
+        </div>
+
+        <div class="dataset-block">
+          <h3>Mural</h3>
+          <figure class="image-wide">
+            <img src="assets/mural1_vs_mural2_matches_tau0p70.png" alt="Mural feature matches" loading="lazy" />
+            <figcaption>26 matches (median r = 0.48)</figcaption>
+          </figure>
+        </div>
+
+        <p>The automatically matched correspondences line up with the manual picks from Part&nbsp;A.</p>
+      </div>
+    </section>
+
+    <!-- B.4 -->
+    <section id="b4-ransac">
+      <h2>B.4 · RANSAC for Robust Homography</h2>
+      <div class="card flow">
+    <p>I now replace the manual correspondences with automatic matches and estimate each homography via a four-point RANSAC loop. Each iteration pulls four unique matches with a fixed RNG seed, rejects any degenerate hypothesis (duplicate points, rank-deficient sets, or triangle areas below 1e-3), fits <code>H<sub>BA</sub></code> using <code>computeH</code>, and scores every correspondence using the symmetric transfer error <code>√(‖H·b − a‖² + ‖H<sup>-1</sup>·a − b‖²)</code>. Inliers satisfy an error threshold of 3&nbsp;px. The loop retains the best model by (inlier count, mean inlier error) and tightens the iteration budget with <code>N = log(1 - 0.99) / log(1 - r⁴)</code>, where <code>r</code> is the best inlier ratio so far.</p>
+    <p>Once the loop finishes I refit <code>H</code> with the inliers, recompute errors, and feed the result into the existing feathered mosaicing routine. Summary statistics for the three scenes are:</p>
+    <pre class="code-block light">Scene      Matches  Inliers  Inlier Ratio  Mean Error  Iterations
+Mural          26       17        65.4%        0.90 px        23
+Trees          65       36        55.4%        1.64 px        87
+Window         69       47        68.1%        1.34 px        44</pre>
+
+    <div class="dataset-block">
+      <h3>Mural</h3>
+      <div class="set-grid two-up">
+      <figure>
+        <img src="assets/mural1_vs_mural2_matches.png" alt="Mural automatic matches" loading="lazy" />
+        <figcaption>All descriptor matches (τ = 0.70)</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mural1_vs_mural2_inliers.png" alt="Mural RANSAC inliers" loading="lazy" />
+        <figcaption>RANSAC keeps 17 correspondences</figcaption>
+      </figure>
+      </div>
+      <figure class="image-wide">
+      <img src="assets/mural1_vs_mural2_auto_mosaic.png" alt="Automatic mural mosaic" loading="lazy" />
+      <figcaption>Automatic mosaic</figcaption>
+      </figure>
+      <figure class="image-wide">
+      <img src="assets/mural_points_manual_vs_auto.png" alt="Mural manual vs automatic mosaic" loading="lazy" />
+      <figcaption>Manual vs automatic</figcaption>
+      </figure>
+    </div>
+
+    <div class="dataset-block">
+      <h3>rees</h3>
+      <div class="set-grid two-up">
+      <figure>
+        <img src="assets/trees1_vs_trees2_matches.png" alt="Trees automatic matches" loading="lazy" />
+        <figcaption>Matches align</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/trees1_vs_trees2_inliers.png" alt="Trees RANSAC inliers" loading="lazy" />
+        <figcaption>RANSAC removes sky outliers and keeps 36 inliers</figcaption>
+      </figure>
+      </div>
+      <figure class="image-wide">
+      <img src="assets/trees1_vs_trees2_auto_mosaic.png" alt="Automatic trees mosaic" loading="lazy" />
+      <figcaption>Automatic mosaic</figcaption>
+      </figure>
+      <figure class="image-wide">
+      <img src="assets/trees_points_manual_vs_auto.png" alt="Trees manual vs automatic mosaic" loading="lazy" />
+      <figcaption>Manual vs automatic. Gain compensation equalizes exposure so both halves match tonally.</figcaption>
+      </figure>
+    </div>
+
+    <div class="dataset-block">
+      <h3>Window</h3>
+      <div class="set-grid two-up">
+      <figure>
+        <img src="assets/window1_vs_window2_matches.png" alt="Window automatic matches" loading="lazy" />
+        <figcaption>Dense matches form on each window sash</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/window1_vs_window2_inliers.png" alt="Window RANSAC inliers" loading="lazy" />
+        <figcaption>47 inliers survive RANSAC</figcaption>
+      </figure>
+      </div>
+      <figure class="image-wide">
+      <img src="assets/window1_vs_window2_auto_mosaic.png" alt="Automatic window mosaic" loading="lazy" />
+      <figcaption>Automatic mosaic</figcaption>
+      </figure>
+      <figure class="image-wide">
+      <img src="assets/window_points_manual_vs_auto.png" alt="Window manual vs automatic mosaic" loading="lazy" />
+      <figcaption>Manual vs automatic</figcaption>
+      </figure>
+    </div>
+
+    <p>The three automatic mosaics are visually indistinguishable from their manual counterparts. Symmetric-transfer scoring, degeneracy checks, and adaptive stopping keep RANSAC efficient (tens of iterations) even with dozens of matches per scene.</p>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
 
