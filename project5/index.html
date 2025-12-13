@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fun with Diffusion Models (Proj 5)</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #0ea5e9;
+      --accent-2: #0284c7;
+      --border: #e2e8f0;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+    header h1 {
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      line-height: 1.15;
+      margin: 0 0 4px;
+      font-size: clamp(26px, 3.5vw, 40px);
+    }
+    section { margin-top: 36px; }
+    h2 { font-size: 22px; margin: 0 0 12px; }
+    h3 { font-size: 18px; margin: 0; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    /* Tighten vertical rhythm inside flow containers by removing default margins */
+    .flow > * { margin: 0; }
+    .flow > * + * { margin-top: 10px; }
+
+    .subtle { color: var(--muted); font-size: 13px; }
+
+    .set-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .set-grid figure {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .set-grid img {
+      width: 100%;
+      border-radius: 0;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .set-grid figcaption {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .set-grid.two-up { align-items: start; }
+    .set-grid.two-up + .image-wide { margin-top: 18px; }
+    .set-grid.rect-after { margin-top: 14px; }
+
+    .code-block {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+      font-size: 12px;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      overflow-x: auto;
+    }
+    .code-block.light {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .dataset-block {
+      margin-top: 24px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+    .dataset-block:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 8px;
+    }
+    .dataset-block h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .image-wide {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .image-wide + .image-wide { margin-top: 24px; }
+    .image-wide img {
+      width: min(100%, 920px);
+      border: 1px solid var(--border);
+      background: #fff;
+      margin: 0 auto;
+      display: block;
+    }
+    .image-wide.rect-before img {
+      width: min(100%, 300px);
+    }
+    .image-wide.half img {
+      width: min(100%, 460px);
+    }
+    .set-grid.rect-after img {
+      width: min(100%, 460px);
+      margin: 0 auto;
+    }
+    .image-wide figcaption {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .multi-labels {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      max-width: 920px;
+    }
+    .multi-labels span {
+      flex: 1;
+      text-align: center;
+    }
+
+    .image-placeholder { min-height: 24px; }
+
+    ul { margin: 0 0 6px 20px; color: var(--muted); }
+
+    .descriptor-visual {
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .descriptor-visual img {
+      width: min(100%, 540px);
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .descriptor-visual.descriptor-montage img {
+      width: min(100%, 380px);
+      image-rendering: pixelated;
+    }
+    .descriptor-visual + .descriptor-visual { margin-top: 24px; }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 28px 16px 64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Fun with Diffusion Models</h1>
+      <p class="subtle">CS180/280A &middot; Project 5</p>
+    </header>
+
+    <!-- Introduction -->
+    <section id="intro">
+      <h2>Introduction</h2>
+      <div class="card flow">
+        <p>
+          This project explores diffusion models through two complementary approaches. In Part A, I use the pretrained DeepFloyd IF model to understand the forward noising process, iterative denoising, classifier-free guidance, SDEdit-style image editing, inpainting, visual anagrams, and hybrid images. In Part B, I build a UNet from scratch for MNIST digit generation, adding time conditioning for flow matching and class conditioning for controllable sampling.
+        </p>
+        <p>
+          For Part A, I ran all experiments locally with DeepFloyd checkpoints and kept the random seed fixed at 100 for reproducibility. I used a CFG scale of 7 for all guided sampling. For Part B, I trained on a single GPU using Adam optimizers with batch size 64 and hidden dimension 64. I used a CFG scale of 5 for class-conditional sampling. The key takeaway is that conditioning signals and CFG dramatically improve sample quality, while learning rate schedules help stabilize training.
+        </p>
+      </div>
+    </section>
+
+    <!-- Part A: Diffusion Models -->
+    <section id="part-a">
+      <h2>Part A &middot; The Power of Diffusion Models</h2>
+      <div class="card flow">
+        <!-- Part A: 0. Setup -->
+        <div class="dataset-block">
+          <h3>0 &middot; Setup and Prompt Embeddings</h3>
+          <p>
+            I initialized DeepFloyd IF locally and fixed
+            the random seed at 100 for every subsequent sampling run. I then generated three images, shown below, with step sizes 20 and then 40. 
+          </p>
+          
+          <figure class="image-wide">
+            <img src="data/first_three.png" alt="Initial samples for three prompts" />
+            <figcaption>20 steps</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/first_three_40.png" alt="Samples refined with 40 steps" />
+            <figcaption>40 steps</figcaption>
+          </figure>
+          <p>
+            The image of the bird shows clear improvement and now accurately depicts the prompt. The "man mid fall" has improved quality but still misses the intended visual of a man in the air or slipping. The alien fleet prompt shows quality improvement in both visuals and accurately depicting the scene.
+          </p>
+        </div>
+
+        <!-- Part A: 1.1 -->
+        <div class="dataset-block">
+          <h3>1.1 &middot; Forward Process</h3>
+          <p>
+            To simulate the forward diffusion trajectory, I sample directly from the analytic
+            distribution <em>q(x<sub>t</sub> | x<sub>0</sub>)</em>. The function mixes the clean Campanile image
+            with Gaussian noise according to the cumulative product of the noise schedule. For each timestep, I scale
+            the clean pixels by √ᾱ<sub>t</sub> and inject fresh noise scaled by √(1 - ᾱ<sub>t</sub>). I reuse the cached
+            <code>alphas_cumprod</code> table so that every forward sample exactly matches the DeepFloyd IF scheduler.
+            This keeps energy consistent and produces the predictable degradation shown below.
+          </p>
+          
+          <figure class="image-wide">
+            <img src="data/denoised_three.png" alt="Campanile diffusion forward process at multiple timesteps" />
+            <figcaption class="multi-labels">
+              <span>t=250</span>
+              <span>t=500</span>
+              <span>t=750</span>
+            </figcaption>
+          </figure>
+        </div>
+        <p></p>
+
+        <!-- Part A: 1.2 -->
+        <div class="dataset-block">
+          <h3>1.2 &middot; Classical Denoising</h3>
+          <p>
+            Here I apply a 2D Gaussian blur with σ = 1.2 and a 5x5 kernel to each noisy Campanile frame using
+            <code>torchvision.transforms.GaussianBlur</code>. This averages neighboring pixels and suppresses high-frequency
+            noise without any learning. The classical method is visibly less effective. Even the output looks like it has another layer of blur on top.
+          </p>
+          <figure class="image-wide">
+            <img src="data/denoise_compare.png" alt="Classical Gaussian denoising compared across noise levels" />
+            <figcaption>Noisy inputs (top) and Gaussian-blur outputs (bottom) for timesteps 250, 500, and 750.</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.3 -->
+        <div class="dataset-block">
+          <h3>1.3 &middot; One-Step Denoising with DeepFloyd</h3>
+          <p>
+            Using the pretrained DeepFloyd UNet, I predict the noise term <em>ε̂<sub>θ</sub>(x<sub>t</sub>, t)</em> for each noisy
+            Campanile frame and perform the single reverse step
+            <code>x̂_0 = (x_t - √(1 - ᾱ_t) · ε̂) / √ᾱ_t</code>. Even without iteration, this brings back sharp roof edges,
+            contrast in the tower windows, and the surrounding trees. It looks far cleaner than the Gaussian blur baseline.
+          </p>
+          <figure class="image-wide">
+            <img src="data/one_step.png" alt="One-step DeepFloyd denoising across multiple timesteps" />
+            <figcaption>Columns: original image, noisy inputs at t = 250/500/750, and the corresponding one-step UNet reconstructions.</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.4 -->
+        <div class="dataset-block">
+          <h3>1.4 &middot; Iterative Denoising</h3>
+          <p>
+            Starting from a noisy Campanile frame at timestep t = 690, I followed the strided cosine schedule toward 0.
+            Each iteration calls the Stage 1 UNet (conditioned on the "high quality picture" prompt embedding) to produce
+            both a noise prediction and a variance term. I reconstruct x̂<sub>0</sub> and blend it with the current image using
+            DDPM weights derived from <code>alphas_cumprod</code>. Then I inject the scheduler variance via <code>add_variance</code> and move to the
+            next timestep. Every fifth step, I convert the tensor from [-1, 1] to display space with <code>to_display</code> to
+            visualize the trajectory. The second strip compares the iterative output with the one-step and Gaussian-blur baselines.
+          </p>
+          <figure class="image-wide">
+            <img src="data/one.png" alt="Iterative denoising trajectory 1" />
+            <figcaption class="multi-labels">
+              <span>step 1: t=690→660</span>
+              <span>step 6: t=540→510</span>
+              <span>step 11: t=390→360</span>
+              <span>step 16: t=240→210</span>
+              <span>step 21: t=90→60</span>
+            </figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/two.png" alt="Iterative denoising trajectory 2" />
+            <figcaption class="multi-labels">
+              <span>Original</span>
+              <span>Noisy (t=690)</span>
+              <span>Iterative denoising</span>
+              <span>One-step denoising</span>
+              <span>Gaussian blur (k=5, σ=2)</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.5 -->
+        <div class="dataset-block">
+          <h3>1.5 &middot; Sampling from Noise</h3>
+          <p>
+            I sampled directly from Gaussian noise by running the same iterative scheduler (cosine/strided steps) used
+            in 1.4, starting at the highest timestep and conditioning on the prompt "a high quality picture." Classifier-free
+            guidance stayed at γ = 5.0 for consistency with earlier runs. Each image below comes from a different random
+            seed, showing varied camera angles, lighting, and subject detail while keeping photorealistic structure.
+          </p>
+          <figure class="image-wide">
+            <img src="data/five_pics.png" alt="Five independent samples generated from pure noise" />
+            <figcaption>Five independent samples from pure noise for the prompt "a high quality picture."</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.6 -->
+        <div class="dataset-block">
+          <h3>1.6 &middot; Classifier-Free Guidance (CFG)</h3>
+          <p>
+            I enabled classifier-free guidance by running two UNet passes per timestep: one conditioned on the prompt
+            "a high quality picture" and one unconditional. Their noise predictions are blended as ε = ε<sub>u</sub> + γ(ε<sub>c</sub> − ε<sub>u</sub>)
+            with guidance scale γ = 7. The blended noise then feeds the usual DDPM update with the scheduler variance
+            (using the conditional branch’s variance). Sampling starts from pure Gaussian noise and follows the same
+            strided/cosine schedule as in 1.4. The five samples below (different seeds) show improved sharpness and
+            prompt adherence while keeping reasonable diversity.
+          </p>
+          <figure class="image-wide">
+            <img src="data/new_five.png" alt="Five CFG-guided samples generated from pure noise" />
+            <figcaption>Five CFG samples from pure noise with guidance scale γ = 7 (prompt: "a high quality picture").</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.7 -->
+        <div class="dataset-block">
+          <h3>1.7 &middot; Image-to-Image Translation (SDEdit-style)</h3>
+          <p>
+            I applied SDEdit-style image-to-image translation by first noising a real image to different starting
+            timesteps (indices [1, 3, 5, 7, 10, 20] in the strided schedule), then denoising with CFG (γ = 7) using
+            conditional and unconditional passes. Higher start indices inject more noise, so lower timesteps preserve
+            structure while higher ones enable stronger edits. All runs share the same prompt embedding for
+            "a high quality picture" and reuse the variance-aware DDPM update from earlier parts.
+          </p>
+          <figure class="image-wide rect-before">
+            <img src="data/campanile.jpeg" alt="Original Campanile photo" />
+            <figcaption>Campanile original (64×64 crop/resize).</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/campanile_range.png" alt="Campanile edits across starting timesteps" />
+            <figcaption class="multi-labels">
+              <span>idx 1 (t=960)</span>
+              <span>idx 3 (t=900)</span>
+              <span>idx 5 (t=840)</span>
+              <span>idx 7 (t=780)</span>
+              <span>idx 10 (t=690)</span>
+              <span>idx 20 (t=390)</span>
+            </figcaption>
+          </figure>
+          <figure class="image-wide rect-before">
+            <img src="data/earth.jpg" alt="Original earth photo" />
+            <figcaption>Earth original (64×64 crop/resize).</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/earth_range.png" alt="Earth edits across starting timesteps" />
+            <figcaption class="multi-labels">
+              <span>idx 1 (t=960)</span>
+              <span>idx 3 (t=900)</span>
+              <span>idx 5 (t=840)</span>
+              <span>idx 7 (t=780)</span>
+              <span>idx 10 (t=690)</span>
+              <span>idx 20 (t=390)</span>
+            </figcaption>
+          </figure>
+          <figure class="image-wide rect-before">
+            <img src="data/bunny.jpeg" alt="Original bunny photo" />
+            <figcaption>Bunny original (64×64 crop/resize).</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/bunny_range.png" alt="Bunny edits across starting timesteps" />
+            <figcaption class="multi-labels">
+              <span>idx 1 (t=960)</span>
+              <span>idx 3 (t=900)</span>
+              <span>idx 5 (t=840)</span>
+              <span>idx 7 (t=780)</span>
+              <span>idx 10 (t=690)</span>
+              <span>idx 20 (t=390)</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.7.1 -->
+        <div class="dataset-block">
+          <h3>1.7.1 &middot; Editing Hand-Drawn and Web Images</h3>
+          <p>
+            I applied the same SDEdit loop to a web photo and two hand-drawn inputs using the prompt
+            <code>"a high quality picture"</code>. Each image is resized to 64x64 and normalized in
+            <code>process_pil_im</code>, then denoised with the six starting indices
+            <code>[1, 3, 5, 7, 10, 20]</code> (timesteps 960, 900, 840, 780, 690, 390).
+          </p>
+
+          <h4>Web image: Pom</h4>
+          <figure class="image-wide rect-before">
+            <img src="data/pom.jpg" alt="Original pom web photo" />
+            <figcaption>Original web image.</figcaption>
+          </figure>
+          <figure class="image-wide rect-before">
+            <img src="data/pom_proc.png" alt="Processed pom web photo" />
+            <figcaption>64&times;64 cropped/normalized input to the model.</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/pom_pics.png" alt="Pom edits across starting timesteps" />
+            <figcaption class="multi-labels">
+              <span>idx 1 (t=960)</span>
+              <span>idx 3 (t=900)</span>
+              <span>idx 5 (t=840)</span>
+              <span>idx 7 (t=780)</span>
+              <span>idx 10 (t=690)</span>
+              <span>idx 20 (t=390)</span>
+            </figcaption>
+          </figure>
+
+          <h4>Hand-drawn: Cube</h4>
+          <figure class="image-wide rect-before">
+            <img src="data/cube.jpg" alt="Original cube drawing" />
+            <figcaption>Original cube sketch.</figcaption>
+          </figure>
+          <figure class="image-wide rect-before">
+            <img src="data/cube_proc.png" alt="Processed cube drawing" />
+            <figcaption>64&times;64 cropped/normalized input to the model.</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/cube_pics.png" alt="Cube edits across starting timesteps" />
+            <figcaption class="multi-labels">
+              <span>idx 1 (t=960)</span>
+              <span>idx 3 (t=900)</span>
+              <span>idx 5 (t=840)</span>
+              <span>idx 7 (t=780)</span>
+              <span>idx 10 (t=690)</span>
+              <span>idx 20 (t=390)</span>
+            </figcaption>
+          </figure>
+
+          <h4>Hand-drawn: Flower</h4>
+          <figure class="image-wide rect-before">
+            <img src="data/flower.jpg" alt="Original flower drawing" />
+            <figcaption>Original flower sketch.</figcaption>
+          </figure>
+          <figure class="image-wide rect-before">
+            <img src="data/flower_proc.png" alt="Processed flower drawing" />
+            <figcaption>64&times;64 cropped/normalized input to the model.</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/flower_pics.png" alt="Flower edits across starting timesteps" />
+            <figcaption class="multi-labels">
+              <span>idx 1 (t=960)</span>
+              <span>idx 3 (t=900)</span>
+              <span>idx 5 (t=840)</span>
+              <span>idx 7 (t=780)</span>
+              <span>idx 10 (t=690)</span>
+              <span>idx 20 (t=390)</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.7.2 -->
+        <div class="dataset-block">
+          <h3>1.7.2 &middot; Inpainting</h3>
+          <p>
+            I implemented RePaint-style inpainting. At each step, I re-noise the preserved region with the current
+            timestep's forward pass and splice it with pure noise inside the binary mask (1 = edit, 0 = keep). Then
+            I denoise with classifier-free guidance (γ = 7) using the same variance-aware DDPM update as before. The
+            <code>inpaint</code> function keeps everything in fp16 on CUDA and iterates over the strided schedule
+            to gradually hallucinate new content inside the masked area while freezing the unmasked pixels.
+          </p>
+
+          <h4>Campanile (reference mask + result)</h4>
+          <figure class="image-wide">
+            <img src="data/campanile_proc_and_inpaint.png" alt="Campanile processed input, mask, and inpainted result" />
+            <figcaption>64×64 processed input, mask, and final inpainted Campanile using the same prompt embedding.</figcaption>
+          </figure>
+
+          <h4>Bunny and Earth inpaints</h4>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="data/bunny_proc.png" alt="Processed bunny input" />
+              <figcaption>Bunny 64×64 processed input.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/bunny_mask.png" alt="Bunny mask" />
+              <figcaption>Bunny mask (white = edit region).</figcaption>
+            </figure>
+            <figure>
+              <img src="data/earth_proc.png" alt="Processed earth input" />
+              <figcaption>Earth 64×64 processed input.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/earth_mask.png" alt="Earth mask" />
+              <figcaption>Earth mask (white = edit region).</figcaption>
+            </figure>
+          </div>
+          <figure class="image-wide">
+            <img src="data/inpaint_two.png" alt="Final inpainted results for bunny and earth" />
+            <figcaption>Final inpainted outputs for bunny and earth using the masked RePaint loop.</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.7.3 -->
+        <div class="dataset-block">
+          <h3>1.7.3 &middot; Text-Conditional Image-to-Image Translation</h3>
+          <p>
+            I used the same SDEdit schedule but swapped the embedding to the prompt <code>"a high quality crayon drawing"</code>.
+            CFG steers the denoising toward crayon texture while the image conditioning keeps structure from the original
+            inputs. Compared to the unconditional runs, the text prompt adds a strong style prior without changing
+            content. Buildings stay recognizable, the bunny pose persists, and Earth retains its continents.
+          </p>
+
+          <figure class="image-wide">
+            <img src="data/crayon_campanile.png" alt="Campanile translated to crayon style" />
+            <figcaption>Campanile edited with text-conditioning to a crayon drawing.</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/crayon_bunny.png" alt="Bunny translated to crayon style" />
+            <figcaption>Bunny in crayon style.</figcaption>
+          </figure>
+          <figure class="image-wide">
+            <img src="data/crayon_earth.png" alt="Earth translated to crayon style" />
+            <figcaption>Earth in crayon style.</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part A: 1.8 -->
+        <div class="dataset-block">
+          <h3>1.8 &middot; Visual Anagrams</h3>
+          <p>
+            I implemented flip illusions by averaging classifier-free guidance noise from two prompts applied to upright
+            and 180-degree-flipped versions of the same latent at every DDPM step. For prompt pair (p₁, p₂), I compute ε₁ on
+            the upright image and ε₂ on the flipped image, then flip ε₂ back. I take ε = (ε₁ + ε₂)/2 and run the usual
+            variance-aware DDPM update. The shared unconditional embedding supports CFG (γ = 7). Starting from pure
+            noise lets the image converge to one concept upright and the other when rotated.
+          </p>
+
+          <h4>Illusion 1: Man mid fall ↔ Paint brush</h4>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="data/man.png" alt="Illusion upright: man mid fall" />
+              <figcaption>Upright: prompt "a man mid fall".</figcaption>
+            </figure>
+            <figure>
+              <img src="data/brush.png" alt="Illusion flipped: paint brush" />
+              <figcaption>Rotated 180°: prompt "a paint brush".</figcaption>
+            </figure>
+          </div>
+
+          <h4>Illusion 2: Caveman ↔ Manatee</h4>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="data/caveman.png" alt="Illusion upright: caveman" />
+              <figcaption>Upright: prompt "a photo of a caveman".</figcaption>
+            </figure>
+            <figure>
+              <img src="data/manatee.png" alt="Illusion flipped: manatee" />
+              <figcaption>Rotated 180°: prompt "a photo of a manatee".</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <!-- Part A: 1.9 -->
+        <div class="dataset-block">
+          <h3>1.9 &middot; Hybrid Images</h3>
+          <p>
+            I built factorized diffusion hybrids by splitting CFG noise into low and high frequencies for two prompts.
+            At each timestep, I compute ε₁ for prompt 1 and ε₂ for prompt 2, then blur both with a 33x33 Gaussian (σ=2).
+            I keep low(ε₁) for coarse structure and compute high(ε₂) = ε₂ - low(ε₂) for fine detail. Then I use ε = low(ε₁) + high(ε₂)
+            in the variance-aware DDPM update. This keeps large shapes from prompt 1 while injecting textures and edges from
+            prompt 2. I reused CFG scale γ=7 and the same strided schedule.
+          </p>
+
+          <h4>Hybrid 1: Man mid fall (low freq) + Paint brush (high freq)</h4>
+          <figure class="image-wide half">
+            <img src="data/manbrush.png" alt="Hybrid of man mid fall and paint brush" />
+            <figcaption>Low frequencies from "a man mid fall"; high frequencies from "a paint brush".</figcaption>
+          </figure>
+
+          <h4>Hybrid 2: Caveman (low freq) + Manatee (high freq)</h4>
+          <figure class="image-wide half">
+            <img src="data/cavemanatee.png" alt="Hybrid of caveman and manatee" />
+            <figcaption>Low frequencies from "a photo of a caveman"; high frequencies from "a photo of a manatee".</figcaption>
+          </figure>
+          <p class="subtle">
+            Up close you see the high-frequency donor (brush bristles, manatee skin), while from farther away the coarse
+            silhouette matches the low-frequency prompt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Part B: Flow Matching -->
+    <section id="part-b">
+      <h2>Part B &middot; Flow Matching from Scratch</h2>
+      <div class="card flow">
+        <p class="subtle">
+          Training UNet-based denoisers and flow-matching models on MNIST, with time and class conditioning.
+        </p>
+
+        <!-- Part B: 1.1 -->
+        <div class="dataset-block">
+          <h3>1.1 &middot; Implementing the UNet</h3>
+          <p>
+            I built a lightweight 28x28 MNIST UNet with two stride-2 conv downsamples to 14x14 then 7x7, AvgPool to 1x1,
+            transpose-conv unflatten back to 7x7, then two upsample stages back to 28x28. Each Conv, Up, and Down block uses
+            3x3 convolutions with BatchNorm and GELU. Channel widths follow D to 2D on the encoder and mirror back to D before
+            a final 1x1 output head. D is a hyperparameter.
+          </p>
+          <ul>
+            <li>I implemented Conv, DownConv, and UpConv building blocks plus Flatten and Unflatten, then stacked them into ConvBlocks and symmetrical down/up paths.</li>
+            <li>Final model path: encoder (ConvBlock D, DownBlock D to 2D), bottleneck (flatten then unflatten), decoder (UpBlock 2D to D, UpBlock D to D), then 1x1 conv head.</li>
+          </ul>
+        </div>
+
+        <!-- Part B: 1.2 -->
+        <div class="dataset-block">
+          <h3>1.2 &middot; Using the UNet to Train a Denoiser</h3>
+          <p>
+            I generated paired (z, x) examples by adding Gaussian noise z = x + σε with ε sampled from N(0, I) to normalized
+            MNIST digits in [0, 1]. I implemented a visualization cell that samples a small batch from the test set,
+            applies σ values of 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, and 1.0 with a fixed seed, clamps to [0, 1], and renders a grid.
+            This confirms the denoising task setup before training.
+          </p>
+          <ul>
+            <li>The noise sweep shows gradual degradation. Digits remain crisp through σ of about 0.4, become fuzzy at 0.6, and are nearly unreadable by σ of 0.8 to 1.0.</li>
+          </ul>
+          <figure class="image-wide half">
+            <img src="data/1.2.png" alt="MNIST digits noised across sigma values" />
+            <figcaption>Noising grid for σ ∈ {0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0} on six MNIST test digits.</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part B: 1.2.1 -->
+        <div class="dataset-block">
+          <h3>1.2.1 &middot; Training (σ = 0.5)</h3>
+          <p>
+            I trained the MNIST denoiser with σ = 0.5 noise for 5 epochs. I used batch size 256, Adam with lr = 1e-4, hidden
+            width D = 128, and on-the-fly noising each batch (z = x + 0.5 times ε). I loaded data from torchvision MNIST with
+            shuffling on train and trained the UNet from 1.1 end-to-end on GPU. Total wall-clock time was 5 minutes and 21.7 seconds.
+          </p>
+          <ul>
+            <li>The loss curve across all iterations shows stable descent without divergence.</li>
+            <li>Denoising quality visibly improves from epoch 1 to epoch 5. Outputs sharpen and recover strokes.</li>
+          </ul>
+          <div class="set-grid two-up">
+            <figure>
+              <img src="data/epoch_1.png" alt="Denoising results after 1 epoch" />
+              <figcaption>Epoch 1: clean / noisy / denoised rows.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/epoch_5.png" alt="Denoising results after 5 epochs" />
+              <figcaption>Epoch 5: cleaner reconstructions after training.</figcaption>
+            </figure>
+          </div>
+          <figure class="image-wide half">
+            <img src="data/1.2.1_plot.png" alt="Training loss curve for sigma 0.5 run" />
+            <figcaption>Training loss curve (σ = 0.5, 5 epochs, batch 256, Adam lr=1e-4).</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part B: 1.2.2 -->
+        <div class="dataset-block">
+          <h3>1.2.2 &middot; Out-of-Distribution Testing</h3>
+          <p>
+              I evaluated the σ = 0.5-trained denoiser on held-out test digits across unseen noise scales
+              of 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, and 1.0. Using a fixed batch and seed, each digit was noised at
+              a given σ then passed through the trained UNet. The model generalizes cleanly for σ at or below 0.5,
+              retains legibility at 0.6 with mild blur, and degrades at 0.8 to 1.0 where inputs are nearly pure
+              noise. Performance peaks near the training σ and falls off smoothly as the gap widens.
+          </p>
+          <ul>
+              <li>Fixed test digits denoised across the σ sweep show strong recovery through 0.5 to 0.6 and visible artifacts beyond 0.8.</li>
+              <li>The model generalizes best near the training σ. High-σ inputs lose structure and the UNet outputs become smeared.</li>
+          </ul>
+            <figure class="image-wide half">
+              <img src="data/1.2.2.png" alt="OOD denoising across sigma values for fixed MNIST digits" />
+              <figcaption>Noisy (top) and denoised (bottom) rows for σ ∈ {0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0} on three test digits.</figcaption>
+            </figure>
+        </div>
+
+        <!-- Part B: 1.2.3 -->
+        <div class="dataset-block">
+          <h3>1.2.3 &middot; Denoising Pure Noise</h3>
+          <p>
+            I retrained the same UNet to map pure Gaussian noise ε from N(0, I) directly to clean MNIST digits for 5 epochs
+            with batch size 256 and Adam lr = 1e-4. Inputs are sampled noise and targets are clean digits. The model learns a
+            deterministic "centroid" of the training set under MSE. Early outputs are blurry digit-like blobs, and later
+            epochs sharpen strokes but still average across modes.
+          </p>
+          <ul>
+            <li>Training loss steadily decreases without instability. The curve flattens after about 4 epochs.</li>
+            <li>Epoch 1 outputs are diffuse blobs. By epoch 5, shapes resemble digits but remain averaged due to mode-averaging under MSE.</li>
+          </ul>
+          <div class="set-grid two-up">
+            <figure>
+              <img src="data/1.2.3_first.png" alt="Pure-noise outputs after epoch 1" />
+              <figcaption>Epoch 1: noisy inputs (row 2) map to blurry digit-like outputs (row 3).</figcaption>
+            </figure>
+            <figure>
+              <img src="data/1.2.3_second.png" alt="Pure-noise outputs after epoch 5" />
+              <figcaption>Epoch 5: outputs sharpen but still average over digit modes.</figcaption>
+            </figure>
+          </div>
+          <figure class="image-wide half">
+            <img src="data/1.2.3_third.png" alt="Training loss curve for pure-noise denoising" />
+            <figcaption>Training loss curve for pure-noise denoising (5 epochs, batch 256, Adam lr = 1e-4).</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part B: 2.1 -->
+        <div class="dataset-block">
+          <h3>2.1 &middot; Adding Time Conditioning to UNet</h3>
+          <p>
+            I injected normalized scalar time t in [0, 1] with two small FCBlocks and used them to modulate decoder
+            features. An FCBlock is Linear then GELU then Linear. The time t goes through fc1_t to scale the bottleneck after
+            unflatten, and fc2_t to scale the first up block. This preserves the original down/skip path while letting
+            time control the flow field prediction.
+          </p>
+          <ul>
+            <li>Modulation points: bottleneck times t1, then up1 output times t2. Skips remain unscaled.</li>
+            <li>t is reshaped to (N,1), passed through FC to (N,C), and broadcast to (N,C,1,1) before multiplication.</li>
+          </ul>
+        </div>
+
+        <!-- Part B: 2.2 -->
+        <div class="dataset-block">
+          <h3>2.2 &middot; Training the Time-Conditioned UNet</h3>
+          <p>
+            I trained the time-conditioned UNet to predict the flow x<sub>1</sub> - x<sub>0</sub> on MNIST. For each batch,
+            I sample t from U[0,1], draw x<sub>0</sub> from N(0,I), mix x<sub>t</sub> = (1-t)x<sub>0</sub> + t x<sub>1</sub>, and minimize MSE
+            between predicted flow u<sub>θ</sub>(x<sub>t</sub>, t) and target x<sub>1</sub> - x<sub>0</sub>. I used batch 64, D = 64, Adam lr = 1e-2,
+            and ExponentialLR with gamma = 0.1^(1/num_epochs) for 5 epochs.
+          </p>
+          <ul>
+            <li>Dataset: MNIST train split only, batch size 64, on-the-fly noise and t sampling per batch.</li>
+            <li>Schedule: Adam lr = 1e-2 with exponential decay. I ran 5 epochs with stable descent.</li>
+          </ul>
+          <figure class="image-wide half">
+            <img src="data/2.2.png" alt="Training loss curve for time-conditioned UNet" />
+            <figcaption>Training loss curve for the time-conditioned UNet (flow matching on MNIST, 5 epochs).</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part B: 2.3 -->
+        <div class="dataset-block">
+          <h3>2.3 &middot; Sampling from the Time-Conditioned UNet</h3>
+          <p>
+            I sample MNIST digits by starting from pure Gaussian noise x<sub>0</sub> ~ N(0, I) and running the Euler
+            sampler from Algorithm&nbsp;2 for T uniform steps t = 0 → 1. At each step I query the trained
+            time-conditioned UNet for the flow u<sub>θ</sub>(x<sub>t</sub>, t) and update x<sub>t+1</sub> = x<sub>t</sub> + (1/T)
+            · u<sub>θ</sub>. After T steps the final x<sub>T</sub> is decoded as an image. I reuse the same sampler while
+            loading checkpoints after different training epochs to see how sample quality evolves.
+          </p>
+          <ul>
+            <li>I generated samples from checkpoints at epochs 1, 5, and 10.</li>
+            <li>Quality quickly improves. Epoch 1 is blurry but digit-like, epoch 5 sharpens strokes, and epoch 10
+              produces crisp, diverse digits.</li>
+          </ul>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="data/2.3_first.png" alt="Samples after 1 epoch of time-conditioned training" />
+              <figcaption>Epoch 1: noisy blobs with emerging digit structure.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/2.3_second.png" alt="Samples after 5 epochs of time-conditioned training" />
+              <figcaption>Epoch 5: strokes are clearer; digits become legible.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/2.3_third.png" alt="Samples after 10 epochs of time-conditioned training" />
+              <figcaption>Epoch 10: clean, diverse digits from pure noise.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <!-- Part B: 2.4 -->
+        <div class="dataset-block">
+          <h3>2.4 &middot; Adding Class Conditioning to UNet</h3>
+          <p>
+            I extended the time-conditioned UNet with class conditioning by adding two more FCBlocks (fc1_c and fc2_c)
+            that take a one-hot encoded class vector c from 0 to 9 as input. The class is converted to a 10-dim
+            one-hot vector and passed through each FCBlock to produce modulation vectors c1 and c2. These combine
+            with time modulations as: <code>bottleneck = c1 * unflatten + t1</code> and
+            <code>up1 = c2 * up1 + t2</code>. This lets class information scale features while time shifts them.
+          </p>
+          <ul>
+            <li>Class representation: one-hot vector (N, 10) through FCBlock to (N, C) and broadcast to (N, C, 1, 1) for spatial modulation.</li>
+            <li>Unconditional branch for CFG: during training, 10% of the time (p_uncond = 0.1) the class vector is
+              zeroed out via a dropout mask. This teaches the model to also predict flows without class information.</li>
+          </ul>
+        </div>
+
+        <!-- Part B: 2.5 -->
+        <div class="dataset-block">
+          <h3>2.5 &middot; Training the Class-Conditioned UNet</h3>
+          <p>
+            I trained the class-conditioned UNet with the same hyperparameters as the time-only version: batch 64,
+            hidden dim D = 64, Adam lr = 1e-2, and ExponentialLR decay with gamma = 0.1^(1/num_epochs) for 10 epochs.
+            The key addition is the 10% class dropout (p_uncond = 0.1) applied per-sample each batch, which prepares
+            the model for classifier-free guidance at inference.
+          </p>
+          <ul>
+            <li>Training uses <code>class_fm_forward</code> which samples t from U[0,1], mixes noise with clean images,
+              randomly masks class conditioning, and minimizes MSE on predicted flow.</li>
+            <li>Convergence is similar to the time-only model. The extra class signal helps the model specialize
+              per digit without slowing down training.</li>
+          </ul>
+          <figure class="image-wide half">
+            <img src="data/2.5.png" alt="Training loss curve for class-conditioned UNet" />
+            <figcaption>Training loss curve for the class-conditioned UNet (flow matching on MNIST, 10 epochs).</figcaption>
+          </figure>
+        </div>
+
+        <!-- Part B: 2.6 -->
+        <div class="dataset-block">
+          <h3>2.6 &middot; Sampling with Class Conditioning and CFG</h3>
+          <p>
+            I sampled from the class-conditioned UNet using classifier-free guidance with γ = 5.0. At each Euler
+            step, I run two forward passes: one with class conditioning (mask = 1) and one unconditional
+            (mask = 0). Then I blend flows as u = u<sub>uncond</sub> + γ(u<sub>cond</sub> - u<sub>uncond</sub>).
+            For each digit 0 to 9, I generate 4 samples to produce a 4x10 grid that shows controllability across
+            all classes.
+          </p>
+          <ul>
+            <li>Epoch 1 samples are noisy but already cluster by class. By epoch 5, digits are legible. Epoch 10
+              produces crisp, class-consistent outputs.</li>
+            <li>CFG amplifies the class signal, improving sharpness and reducing ambiguity compared to
+              unconditional sampling.</li>
+          </ul>
+          <div class="set-grid two-up rect-after">
+            <figure>
+              <img src="data/2.6_one.png" alt="Class-conditional samples after epoch 1" />
+              <figcaption>Epoch 1: emerging class structure with noise.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/2.6_two.png" alt="Class-conditional samples after epoch 5" />
+              <figcaption>Epoch 5: digits become legible and class-consistent.</figcaption>
+            </figure>
+            <figure>
+              <img src="data/2.6_three.png" alt="Class-conditional samples after epoch 10" />
+              <figcaption>Epoch 10: clean, diverse samples for each digit class.</figcaption>
+            </figure>
+          </div>
+
+          <h4>Training without LR Scheduler</h4>
+          <p>
+            To remove the exponential learning rate scheduler while maintaining performance, I lowered the
+            constant learning rate from 1e-2 to 1e-3. The scheduler originally decayed lr from 1e-2 down to
+            about 1e-3 over 10 epochs. A fixed 1e-3 approximates the average effective rate and avoids early
+            instability from a high initial lr. The resulting samples below are comparable in quality,
+            demonstrating that simplicity can match scheduled training when the constant lr is chosen
+            appropriately.
+          </p>
+          <figure class="image-wide">
+            <img src="data/2.6_four.png" alt="Class-conditional samples without LR scheduler" />
+            <figcaption>Samples after 10 epochs with constant lr = 1e-3 (no scheduler).</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
