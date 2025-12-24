@@ -1,0 +1,70 @@
+Sufjan Fana
+(510) 755-7828 | sufjanfana@gmail.com | linkedin.com/in/sufjanfana | github.com/sufjanF
+
+Education
+University of California, Berkeley
+
+December 2025
+
+Applied Mathematics, B.A. + Computer Science, B.A.
+• Relevant Courses: Machine Learning and Data Analytics, Deep Neural Networks, Computer Vision and
+Computational Photography, User Interface and Design, Optimization Models in Engineering, Probability and
+Random Processes, Computer Architecture, Abstract Linear Algebra, Linguistic Science
+
+Experience
+Research Assistant: Linguistic Analysis
+
+August 2024 – June 2025
+
+Alexandra Pfiffner, U.C. Berkeley
+• Automated phonetic analysis in R, Python, Praat to segment Atchan and Nghlwa recordings
+• Standardized ELAN and Praat workflows to produce consistent segmentation and labels used across the lab
+• Analyzed implosive acoustics and delivered visuals that informed ongoing lab manuscripts
+
+Data Informatics Intern
+
+August 2024 – December 2024
+
+Museum of Vertebrate Zoology, U.C. Berkeley
+• Built SQL queries and cleanup scripts that improved specimen searchability and curator workflows
+• Beta-tested portal features, filed actionable bugs, and added Python, R, HTML scripts for data pulls
+• Produced GIS layers and maps for amphibian records, later published with citations
+
+Information Technology Intern
+
+January 2021 – August 2022
+
+De Anza College / Foothill College
+• Resolved high-volume tech tickets for 20,000 students and faculty, raising resolutions with clear guides
+• Performed updates and software configuration across lab machines to improve performance and security
+• Trained users on new tools and basic cyber awareness, wrote quick-start docs adopted by departments
+
+Projects
+Steering Analysis for Vision-Language-Action Models | Python, PyTorch
+• Reproduced activation-level steering via token-space clustering on OpenVLA and validated behavior changes
+through robot rollouts; evaluated transfer across prompts and tasks
+• Compared token projection against a fine-tuned sparse autoencoder probe on pi0.5’s semantic bottleneck;
+analyzed latent geometry and found instruction semantics entangled with sensorimotor state
+• Ran ablations on normalization and training mixtures using ∼10M instruction-token residual activations;
+documented failure cases and stability limits under distribution shift
+Automatic Panorama Stitching and Seam Blending | Python, NumPy, OpenCV
+• Estimated homographies with DLT + RANSAC using Harris corners, ANMS selection, MOPS-style 8×8 descriptors,
+and Lowe ratio matching with a mutual check
+• Warped images with inverse mapping and bilinear sampling, then blended overlaps with distance-transform
+alpha masks and least-squares gain compensation to hide exposure seams
+• Built a photo mosaic system with color matching and patch assignment; compared matching strategies and
+tuned tile sizes for sharper reconstructions
+Diffusion Image Generation and Editing | Python, PyTorch, DeepFloyd IF
+• Implemented forward noising and iterative denoising with classifier-free guidance; reproduced SDEdit-style
+edits, RePaint-style inpainting, and hybrid/anagram image effects
+• Built and trained a U-Net from scratch for MNIST generation and denoising; added sinusoidal time conditioning
+and class conditioning for controllable sampling
+• Ran qualitative and compute tradeoff studies across step counts and guidance scales; curated result grids and
+failure cases for prompt sensitivity and artifacts
+
+Technical Skills
+Languages: Python, Javascript, HTML/CSS, Typescript, Java, SQL, R
+Developer Tools: PostgreSQL, DuckDB, Next.js (React), Prisma, Streamlit, scikit-learn, pandas, SciPy, Git
+Other: Excel, Figma, ArcGIS, QGIS
+
+

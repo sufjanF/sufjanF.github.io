@@ -72,7 +72,33 @@
       letter-spacing:-.02em; line-height:1.1; margin-bottom:.5rem;
       text-shadow:0 2px 24px rgba(0,0,0,.35);
     }
-    .subtitle{color:var(--muted);font-weight:500;font-size:1.1rem;margin-bottom:1rem}
+    .subtitle{color:var(--muted);font-weight:500;font-size:1.02rem;margin-bottom:.5rem}
+    .edu{color:#e5e7eb;font-weight:600;font-size:.93rem;margin-bottom:.75rem}
+    .edu span{color:var(--accent)}
+    .actions{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:.35rem}
+    .btn{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:.55rem .9rem;border-radius:7px;font-weight:600;font-size:.92rem;text-decoration:none;color:var(--text);border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);transition:background .2s ease,border-color .2s ease,transform .15s ease}
+    .btn:hover{background:rgba(255,255,255,.16);border-color:rgba(255,208,137,.5);transform:translateY(-2px)}
+    .btn.secondary{background:rgba(125,211,252,.12);border-color:rgba(125,211,252,.4);color:#e8f4ff}
+    .btn.accent{background:rgba(255,208,137,.16);border-color:rgba(255,208,137,.5);color:#fff}
+    .btn::after{
+      content:attr(data-url);
+      position:absolute;
+      top:calc(100% + 6px);
+      left:50%;
+      transform:translate(-50%,2px);
+      padding:.28rem .5rem;
+      border-radius:6px;
+      background:rgba(7,10,23,.85);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      font-size:.78rem;
+      white-space:nowrap;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .16s ease, transform .16s ease;
+      z-index:10;
+    }
+    .btn:hover::after{opacity:1;transform:translate(-50%,-2px)}
 
     /* MAIN */
     main.container{
@@ -104,6 +130,10 @@
       padding:1.4rem;
       backdrop-filter: blur(8px);
     }
+
+    .chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.1rem}
+    .chip{padding:.3rem .6rem;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:.82rem;color:#dfe6f5}
+    .section-lead{color:#cbd5e1;font-size:.98rem;line-height:1.55}
 
     .grid{
       display:grid;
@@ -153,6 +183,9 @@
     @media (max-width:480px){
       .hero{min-height:32vh;padding:3.5rem 1rem 2rem;background-position:center 36%}
       .grid{grid-template-columns:1fr}
+      .panel{padding:1.1rem}
+      .card{padding:1rem 1rem}
+      .btn{width:100%;justify-content:center}
     }
   </style>
 </head>
@@ -161,10 +194,31 @@
     <div class="inner">
       <h1>Sufjan Fana</h1>
       <p class="subtitle">Performance Optimization · Computer Vision · Machine Learning · Data Engineering · Cloud Computing</p>
+      <p class="edu">Dual BA: <span>Applied Mathematics</span> & <span>Computer Science</span>, UC Berkeley (Dec 2025)</p>
+      <div class="actions">
+        <a class="btn accent" href="mailto:sufjanfana@gmail.com" data-url="sufjanfana@gmail.com">Email</a>
+        <a class="btn" href="/resume.pdf" target="_blank">Resume</a>
+        <a class="btn secondary" href="https://linkedin.com/in/sufjanfana" target="_blank" data-url="linkedin.com/in/sufjanfana">LinkedIn</a>
+        <a class="btn" href="https://github.com/sufjanF" target="_blank" data-url="github.com/sufjanF">GitHub</a>
+      </div>
     </div>
   </header>
 
   <main class="container">
+    <h2 class="section-title">About</h2>
+    <section class="panel">
+      <p class="section-lead">Engineer focused on applied machine learning, computer vision, and generative imaging. I build diffusion and deep learning pipelines, optimize model performance, and ship reliable data workflows across SQL, Python, and cloud. Interested in roles spanning ML engineering, CV, and generative media.</p>
+    </section>
+
+    <h2 class="section-title">Skills</h2>
+    <section class="panel">
+      <div class="chips">
+        <span class="chip">Python · PyTorch</span><span class="chip">Computer Vision · Generative Imaging</span><span class="chip">Diffusion · Deep Learning</span>
+        <span class="chip">Optimization · Model Efficiency</span><span class="chip">SQL (PostgreSQL, DuckDB)</span><span class="chip">Data Engineering · Cloud</span>
+        <span class="chip">TypeScript/JavaScript · React</span><span class="chip">ML Systems · Reliability</span><span class="chip">Git · Shipping</span>
+      </div>
+    </section>
+
     <h2 class="section-title">Work</h2>
     <section class="panel">
       <div class="grid">
@@ -192,6 +246,7 @@
     <p style="color:#a7b0c3;font-size:.85rem;text-align:center;max-width:860px;margin:0 auto;">
       *Code available on request.
     </p>
+
   </main>
 
   <footer>
