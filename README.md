@@ -1,5 +1,7 @@
 # Sufjan Fana – Portfolio
 
+Live site: https://sufjanf.github.io/
+
 A compact hub for selected work in computer vision, generative modeling, and research.
 
 ## Entries
