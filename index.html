@@ -149,13 +149,27 @@
 
     .theme-toggle {
       font-family: 'IBM Plex Sans', system-ui, sans-serif;
-      font-size: 0.75rem;
+      font-size: 0.9rem;
       color: var(--text);
       background: var(--surface);
       border: 1px solid var(--border);
-      padding: 0.55rem 0.9rem;
+      width: 2.4rem;
+      height: 2.2rem;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
       cursor: pointer;
       transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .theme-toggle[data-theme="light"] {
+      font-size: 0.95rem;
+    }
+
+    .theme-toggle[data-theme="dark"] {
+      font-size: 0.9rem;
     }
 
     .theme-toggle:hover {
@@ -534,19 +548,21 @@
     document.getElementById('year').textContent = new Date().getFullYear()
 
     const toggle = document.getElementById('themeToggle')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const storedTheme = localStorage.getItem('theme')
 
-    if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
-      document.body.classList.add('dark')
-      toggle.textContent = '☀'
+    const setTheme = (isDark, persist = true) => {
+      document.body.classList.toggle('dark', isDark)
+      toggle.textContent = isDark ? '☾' : '☀'
+      toggle.dataset.theme = isDark ? 'dark' : 'light'
+      if (persist) {
+        localStorage.setItem('theme', isDark ? 'dark' : 'light')
+      }
     }
 
+    setTheme(storedTheme === 'dark', false)
+
     toggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark')
-      const isDark = document.body.classList.contains('dark')
-      toggle.textContent = isDark ? '☀' : '☾'
-      localStorage.setItem('theme', isDark ? 'dark' : 'light')
+      setTheme(!document.body.classList.contains('dark'))
     })
   </script>
 </body>
